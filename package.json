@@ -6,19 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@heroui/react": "^2.8.2",
+    "@iconify/react": "^6.0.0",
+    "@prisma/client": "^6.13.0",
+    "bcryptjs": "^3.0.2",
+    "framer-motion": "^12.23.12",
+    "next": "15.4.5",
+    "next-themes": "^0.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.4.5"
+    "recharts": "^3.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "prisma": "^6.13.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

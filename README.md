@@ -34,3 +34,37 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# run file ts
+
+```bash
+npx tsx test.ts
+```
+
+# Prisma Setup
+
+```bash
+npm install prisma @prisma/extension-accelerate --save-dev
+
+npx prisma init
+npx prisma db push
+npx prisma generate
+npx prisma studio
+
+```
+
+# lib/prisma.ts
+
+```java
+import { PrismaClient } from "@/app/generated/prisma/client";
+
+import { withAccelerate } from "@prisma/extension-accelerate";
+
+const prisma = new PrismaClient().$extends(withAccelerate());
+
+const globalForPrisma = global as unknown as { prisma: typeof prisma };
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export default prisma;
+```
