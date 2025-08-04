@@ -1,9 +1,24 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import prisma from "./lib/prisma";
+import { prisma } from "./lib/prisma";
 import bcrypt from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
+  callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.user = user;
+      }
+
+      return token;
+    },
+    async session({ session, token }: any) {
+      session.user = token.user;
+      delete session.user.password; // Remove password from session
+      return session;
+    },
+  },
   providers: [
     Credentials({
       credentials: {
@@ -22,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!isValid) return null;
 
-        return { id: user.id, email: user.email };
+        return user;
       },
     }),
   ],

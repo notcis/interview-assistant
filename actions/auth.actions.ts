@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { ProviderName } from "@/interface";
 import { formatError } from "@/utils";
 import bcrypt from "bcryptjs";
