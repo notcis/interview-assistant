@@ -35,3 +35,8 @@ export interface Subscription {
   nextPaymentAttempt: Date;
   userId: string;
 }
+
+export interface UserWithDetails extends User {
+  ProfilePicture: { id: string; url: string | null };
+  authProvider: { provider: ProviderName; providerId: string };
+}
