@@ -11,24 +11,18 @@ export const registerUser = async (
   password: string
 ) => {
   try {
-    await prisma.$transaction(async (tx) => {
-      const hashPassword = bcrypt.hashSync(password, 10);
-
-      const newUser = await tx.user.create({
-        data: {
-          name,
-          email,
-          password: hashPassword,
+    await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: bcrypt.hashSync(password, 10),
+        authProvider: {
+          create: {
+            provider: ProviderName.credentials,
+            providerId: email,
+          },
         },
-      });
-
-      await tx.authProvider.create({
-        data: {
-          provider: ProviderName.credentials,
-          providerId: newUser.email,
-          userId: newUser.id,
-        },
-      });
+      },
     });
 
     return {

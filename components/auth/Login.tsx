@@ -23,11 +23,19 @@ export default function Login() {
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      callbackUrl: "/app/dashboard",
     });
 
     console.log("Login response:", res);
 
+    // Handle error (e.g., show a notification)
+  };
+
+  const handlerGithubLogin = async () => {
+    const res = await signIn("github", {
+      callbackUrl: "/app/dashboard",
+    });
+    console.log("Github login response:", res);
     // Handle error (e.g., show a notification)
   };
 
@@ -107,6 +115,7 @@ export default function Login() {
               <Icon className="text-default-500" icon="fe:github" width={24} />
             }
             variant="bordered"
+            onPress={handlerGithubLogin}
           >
             Continue with Github
           </Button>

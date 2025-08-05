@@ -37,6 +37,7 @@ export interface Subscription {
 }
 
 export interface UserWithDetails extends User {
+  image?: string;
   ProfilePicture: { id: string; url: string | null };
   authProvider: { provider: ProviderName; providerId: string };
 }
