@@ -39,6 +39,14 @@ export default function Login() {
     // Handle error (e.g., show a notification)
   };
 
+  const handlerGoogleLogin = async () => {
+    const res = await signIn("google", {
+      callbackUrl: "/app/dashboard",
+    });
+    console.log("Github login response:", res);
+    // Handle error (e.g., show a notification)
+  };
+
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large">
@@ -107,6 +115,7 @@ export default function Login() {
           <Button
             startContent={<Icon icon="flat-color-icons:google" width={24} />}
             variant="bordered"
+            onPress={handlerGoogleLogin}
           >
             Continue with Google
           </Button>
