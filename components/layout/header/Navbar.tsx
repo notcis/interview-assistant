@@ -29,8 +29,6 @@ const Navbar = () => {
 
   const user = data?.user as UserWithDetails;
 
-  console.log("User data in Navbar:", user);
-
   return (
     <HeroUINavbar
       maxWidth="xl"

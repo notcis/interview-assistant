@@ -86,7 +86,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // If the user is signing in, we add the user to the token
       if (user) {
         token.user = user;
-      }
+      } /* else {
+        // If the user is already in the token, we fetch their details from the database
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.user.id },
+          include: { ProfilePicture: true, authProvider: true },
+        });
+
+        // If the user exists in the database, we add their information to the token
+        if (dbUser) {
+          token.user = dbUser;
+        }
+      } */
 
       return token;
     },

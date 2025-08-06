@@ -5,25 +5,25 @@ import { Button, Input, Link, Form } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { Logo } from "@/config/logo";
 import { registerUser } from "@/actions/auth.actions";
+import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+  const router = useRouter();
+
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    const res = await registerUser(name, email, password);
+  const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
+    const res = await registerUser(data.name, data.email, data.password);
     if (!res.success) {
-      console.error("Registration failed:", res.message);
+      toast.error(res.message);
       return;
     }
-    console.log("Registration successful:", res.message);
-  };
+    toast.success(res.message);
+    router.push("/login");
+  });
 
   return (
     <div className="flex h-full w-full items-center justify-center">
@@ -36,7 +36,7 @@ export default function Register() {
           </p>
         </div>
         <div className="flex flex-col gap-3">
-          <Form validationBehavior="native" onSubmit={submitHandler}>
+          <Form validationBehavior="native" onSubmit={handleSubmit}>
             <div className="flex flex-col w-full">
               <Input
                 isRequired
@@ -95,7 +95,13 @@ export default function Register() {
               />
             </div>
 
-            <Button className="w-full mt-2" color="primary" type="submit">
+            <Button
+              className="w-full mt-2"
+              color="primary"
+              type="submit"
+              isDisabled={loading}
+              isLoading={loading}
+            >
               Register
             </Button>
           </Form>

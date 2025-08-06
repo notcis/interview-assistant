@@ -10,6 +10,8 @@ export const registerUser = async (
   email: string,
   password: string
 ) => {
+  //await new Promise((resolve) => setTimeout(resolve, 5000)); // Simulate a delay for demonstration purposes
+
   try {
     await prisma.user.create({
       data: {
@@ -33,7 +35,10 @@ export const registerUser = async (
     console.error("Error in register action:", error);
     return {
       success: false,
-      message: formatError(error),
+      message:
+        formatError(error) === "User_email_key already exists"
+          ? "Email already exists"
+          : formatError(error),
     };
   }
 };

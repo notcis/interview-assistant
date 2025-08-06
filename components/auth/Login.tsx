@@ -6,30 +6,31 @@ import { Icon } from "@iconify/react";
 import { Logo } from "@/config/logo";
 
 import { signIn } from "next-auth/react";
+import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
+
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    // Handle login logic here, e.g., call an API to authenticate
-
+  const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
     const res = await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/app/dashboard",
+      email: data.email,
+      password: data.password,
+      redirect: false,
     });
 
-    console.log("Login response:", res);
+    if (res?.error) {
+      toast.error("Email or password is incorrect");
+      return;
+    }
 
-    // Handle error (e.g., show a notification)
-  };
+    router.push("/app/dashboard");
+  });
 
   const handlerGithubLogin = async () => {
     const res = await signIn("github", {
@@ -60,7 +61,7 @@ export default function Login() {
         <Form
           className="flex flex-col gap-3"
           validationBehavior="native"
-          onSubmit={submitHandler}
+          onSubmit={handleSubmit}
         >
           <Input
             isRequired
@@ -102,7 +103,13 @@ export default function Login() {
               Forgot password?
             </Link>
           </div>
-          <Button className="w-full" color="primary" type="submit">
+          <Button
+            className="w-full"
+            color="primary"
+            type="submit"
+            disabled={loading}
+            isLoading={loading}
+          >
             Sign In
           </Button>
         </Form>

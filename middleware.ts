@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { auth } from "./auth";
+import { auth } from "@/auth";
 import type { NextRequest } from "next/server";
 
 export default async function middleware(request: NextRequest) {
   // Check if the user is authenticated
   const session = await auth();
   // If the user is not authenticated, redirect to the login page
-  const protectedPaths = ["/app"];
+  const protectedPaths = ["/app/"];
   // Check if the request path is protected
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
   // If the path is protected and the user is not authenticated, redirect to login
-  const isAuthenticated = session?.user;
 
-  if (isProtectedPath && !isAuthenticated) {
+  if (isProtectedPath && !session) {
     const url = new URL("/login", request.url);
     return NextResponse.redirect(url);
   }

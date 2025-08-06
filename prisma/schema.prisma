@@ -44,7 +44,7 @@ model AuthProvider {
 model Subscription {
   id                 String   @id @default(uuid())
   userId             String
-  customer           String
+  customerId         String
   created            DateTime @default(now())
   status             String
   startDate          DateTime

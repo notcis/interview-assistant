@@ -27,7 +27,7 @@ export interface AuthProvider {
 
 export interface Subscription {
   id: string;
-  customer: string;
+  customerId: string;
   created: Date;
   status: string;
   startDate: Date;
