@@ -53,47 +53,53 @@ export const updateProfile = async ({
   avatar?: string;
 }) => {
   try {
+    // Get the current session
     const session = await auth();
 
-    if (!session || !session.user) {
+    // Check if the user is authenticated
+    if (!session || !session.user?.id) {
       return {
         success: false,
         message: "User not authenticated",
       };
     }
 
-    const resUpload = {
-      id: "",
-      url: "",
-    };
-
+    // If an avatar is provided, upload it and update the user's profile picture
     if (avatar) {
+      // Upload the avatar image to cloud storage
       const { id: avatarId, url: avatarUrl } = await upload_file(
         avatar,
         "assistants/avatars"
       );
-      resUpload.id = avatarId;
-      resUpload.url = avatarUrl;
+
+      // If the user already has an avatar, delete the old one
+      const oldAvatar = await prisma.profilePicture.findUnique({
+        where: { userId: session.user.id },
+        select: { urlId: true },
+      });
+
+      // If an old avatar exists, delete it from cloud storage
+      if (oldAvatar?.urlId) {
+        await delete_file(oldAvatar.urlId);
+      }
+
+      // Upsert the profile picture with the new avatar URL and ID
+      await prisma.profilePicture.upsert({
+        where: { userId: session.user.id },
+        update: { url: avatarUrl, urlId: avatarId },
+        create: {
+          url: avatarUrl,
+          urlId: avatarId,
+          userId: session.user.id,
+        },
+      });
     }
 
-    const oldAvatar = await prisma.profilePicture.findUnique({
-      where: { userId: session.user.id },
-      select: { urlId: true },
-    });
-
-    if (oldAvatar?.urlId) {
-      await delete_file(oldAvatar.urlId);
-    }
+    // Update the user's name in the database
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
         name,
-        ProfilePicture: {
-          upsert: {
-            create: { url: resUpload.url, urlId: resUpload.id },
-            update: { url: resUpload.url, urlId: resUpload.id },
-          },
-        },
       },
     });
 

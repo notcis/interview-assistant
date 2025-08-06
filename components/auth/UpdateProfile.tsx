@@ -10,10 +10,16 @@ import { updateProfile } from "@/actions/auth.actions";
 import toast from "react-hot-toast";
 
 export default function UpdateProfile() {
-  const { data: session, status } = useSession() as {
+  const {
+    data: session,
+    status,
+    update,
+  } = useSession() as {
     data: { user: UserWithDetails } | null;
     status: "loading" | "authenticated" | "unauthenticated";
+    update: () => Promise<any>;
   };
+  // State to hold the avatar image
   const [avatar, setAvatar] = useState("");
 
   const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
@@ -28,11 +34,19 @@ export default function UpdateProfile() {
       toast.error(res.message);
       return;
     }
-    toast.success(res.message);
+    // Update the session with the new user data
+    const updateSession = await update();
+
+    // If the session update is successful, show a success message
+    if (updateSession) {
+      toast.success(res.message);
+    }
   });
 
+  // Handle file input change to set the avatar
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = Array.from(e.target.files || []);
+
     const reader = new FileReader();
 
     reader.onload = () => {

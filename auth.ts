@@ -86,19 +86,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Return true to indicate successful sign-in
       return true;
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger }: any) {
+      // If the user is signing in for the first time, we add the user ID to the token
       if (user) {
         token.user = user;
-      } else if (typeof window === "undefined") {
-        // ตรวจสอบว่าโค้ดนี้ทำงานในฝั่งเซิร์ฟเวอร์
+      }
+      // If the user is already signed in, we fetch the user from the database
+      else {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.user.id },
           include: { ProfilePicture: true, authProvider: true },
         });
 
+        // If the user exists in the database, we add it to the token
         if (dbUser) {
           token.user = dbUser;
         }
+      }
+
+      if (trigger === "update") {
+        let updatedUser = await prisma.user.findUnique({
+          where: { id: token.user.id },
+          include: { ProfilePicture: true, authProvider: true },
+        });
+        token.user = updatedUser;
       }
 
       return token;
