@@ -9,7 +9,7 @@ cloudinary.v2.config({
 const upload_file = (
   file: string,
   folder: string
-): Promise<{ public_id: string; url: string }> => {
+): Promise<{ id: string; url: string }> => {
   return new Promise((resolve, reject) => {
     cloudinary.v2.uploader.upload(
       file,
@@ -22,7 +22,7 @@ const upload_file = (
           return reject(error || new Error("Upload failed"));
         }
         resolve({
-          public_id: result.public_id,
+          id: result.public_id,
           url: result.secure_url,
         });
       }

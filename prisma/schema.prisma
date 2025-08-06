@@ -29,6 +29,7 @@ model User {
 model ProfilePicture {
   id     String  @id @default(uuid())
   userId String  @unique
+  urlId  String?
   url    String?
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

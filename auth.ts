@@ -7,6 +7,10 @@ import bcrypt from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
     signIn: async ({ user, account, profile }: any) => {
       // If the user is signing in with credentials, we need to ensure they exist
@@ -83,21 +87,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
     async jwt({ token, user }: any) {
-      // If the user is signing in, we add the user to the token
       if (user) {
         token.user = user;
-      } /* else {
-        // If the user is already in the token, we fetch their details from the database
+      } else if (typeof window === "undefined") {
+        // ตรวจสอบว่าโค้ดนี้ทำงานในฝั่งเซิร์ฟเวอร์
         const dbUser = await prisma.user.findUnique({
           where: { id: token.user.id },
           include: { ProfilePicture: true, authProvider: true },
         });
 
-        // If the user exists in the database, we add their information to the token
         if (dbUser) {
           token.user = dbUser;
         }
-      } */
+      }
 
       return token;
     },
@@ -107,6 +109,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // Remove sensitive information from the session
       delete session.user.password;
+
+      console.log("Session:", session);
 
       return session;
     },

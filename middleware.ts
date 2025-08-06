@@ -1,24 +1,23 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 export default async function middleware(request: NextRequest) {
-  // Check if the user is authenticated
-  const session = await auth();
-  // If the user is not authenticated, redirect to the login page
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
+
   const protectedPaths = ["/app/"];
-  // Check if the request path is protected
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
-  // If the path is protected and the user is not authenticated, redirect to login
 
-  if (isProtectedPath && !session) {
+  if (isProtectedPath && !token) {
     const url = new URL("/login", request.url);
     return NextResponse.redirect(url);
   }
 
-  // If the user is authenticated, allow the request to proceed
   return NextResponse.next();
 }
 
