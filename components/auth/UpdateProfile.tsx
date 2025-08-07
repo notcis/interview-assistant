@@ -40,6 +40,7 @@ export default function UpdateProfile() {
     // If the session update is successful, show a success message
     if (updateSession) {
       toast.success(res.message);
+      setAvatar("");
     }
   });
 

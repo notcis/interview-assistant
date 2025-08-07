@@ -6,6 +6,11 @@ import { formatError } from "@/utils";
 import bcrypt from "bcryptjs";
 import { delete_file, upload_file } from "@/utils/cloudinary";
 import { auth } from "@/auth";
+import {
+  RegisterUserSchema,
+  UpdatePasswordSchema,
+  UpdateProfileSchema,
+} from "@/utils/validations";
 
 export const registerUser = async (
   name: string,
@@ -15,15 +20,18 @@ export const registerUser = async (
   //await new Promise((resolve) => setTimeout(resolve, 5000)); // Simulate a delay for demonstration purposes
 
   try {
+    // Validate the input data using the RegisterUserSchema
+    const parsedData = RegisterUserSchema.parse({ name, email, password });
+
     await prisma.user.create({
       data: {
-        name,
-        email,
-        password: bcrypt.hashSync(password, 10),
+        name: parsedData.name,
+        email: parsedData.email,
+        password: bcrypt.hashSync(parsedData.password, 10),
         authProvider: {
           create: {
             provider: ProviderName.credentials,
-            providerId: email,
+            providerId: parsedData.email, // Using email as providerId for credentials
           },
         },
       },
@@ -64,11 +72,14 @@ export const updateProfile = async ({
       };
     }
 
+    // Validate the input data using the UpdateProfileSchema
+    const parsedData = UpdateProfileSchema.parse({ name, avatar });
+
     // If an avatar is provided, upload it and update the user's profile picture
-    if (avatar) {
+    if (parsedData.avatar) {
       // Upload the avatar image to cloud storage
       const { id: avatarId, url: avatarUrl } = await upload_file(
-        avatar,
+        parsedData.avatar,
         "assistants/avatars"
       );
 
@@ -99,7 +110,7 @@ export const updateProfile = async ({
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        name,
+        name: parsedData.name,
       },
     });
 
@@ -109,6 +120,71 @@ export const updateProfile = async ({
     };
   } catch (error) {
     console.error("Error in update profile action:", error);
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+};
+
+export const updateUserPassword = async ({
+  newPassword,
+  confirmPassword,
+}: {
+  newPassword: string;
+  confirmPassword: string;
+}) => {
+  try {
+    // Get the current session
+    const session = await auth();
+
+    // Check if the user is authenticated
+    if (!session || !session.user?.id) {
+      return {
+        success: false,
+        message: "User not authenticated",
+      };
+    }
+
+    // Validate the new password and confirm password
+    const parsedData = UpdatePasswordSchema.parse({
+      newPassword,
+      confirmPassword,
+    });
+
+    // Check if the user has a credentials auth provider
+    if (
+      !session?.user?.authProvider.some(
+        (provider: { provider: string }) =>
+          provider.provider === ProviderName.credentials
+      )
+    ) {
+      await prisma.authProvider.create({
+        data: {
+          provider: ProviderName.credentials,
+          providerId: session.user.email!, // Using email as providerId for credentials
+          userId: session.user.id,
+        },
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = bcrypt.hashSync(parsedData.newPassword, 10);
+
+    // Update the user's password in the database
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Password updated successfully",
+    };
+  } catch (error) {
+    console.error("Error in update password action:", error);
     return {
       success: false,
       message: formatError(error),

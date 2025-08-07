@@ -2,23 +2,22 @@
 
 // Utility functions for error handling and async operations
 export function formatError(error: any) {
+  // รองรับทั้ง Zod v3 (error.errors เป็น array) และ Zod v4 (error.issues เป็น array)
   if (error.name === "ZodError") {
-    const fieldErrors = Object.keys(error.errors).map(
-      (field) => error.errors[field].message
-    );
-
-    return fieldErrors.join(". ");
+    const issues = error.errors || error.issues;
+    if (Array.isArray(issues)) {
+      return issues.map((e: any) => e.message).join(". ");
+    }
   } else if (
     error.name === "PrismaClientKnownRequestError" &&
     error.code === "P2002"
   ) {
     const field = error.meta.target ? error.meta.target : "field";
-
     return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
+  } else if (error.message) {
+    return error.message;
   } else {
-    return typeof error.message === "string"
-      ? error.message
-      : JSON.stringify(error.message);
+    return JSON.stringify(error);
   }
 }
 
