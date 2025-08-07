@@ -15,15 +15,17 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  name           String
-  email          String          @unique
-  role           String          @default("user")
-  password       String?
-  createdAt      DateTime        @default(now())
-  authProvider   AuthProvider[]
-  Subscription   Subscription[]
-  ProfilePicture ProfilePicture?
+  id                  String          @id @default(uuid())
+  name                String
+  email               String          @unique
+  role                String          @default("user")
+  password            String?
+  createdAt           DateTime        @default(now())
+  resetPasswordToken  String?
+  resetPasswordExpire DateTime?
+  authProvider        AuthProvider[]
+  Subscription        Subscription[]
+  ProfilePicture      ProfilePicture?
 }
 
 model ProfilePicture {

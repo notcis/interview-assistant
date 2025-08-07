@@ -11,10 +11,13 @@ export interface User {
   role: string;
   password: string | null;
   createdAt: Date;
+  resetPasswordToken: string | null;
+  resetPasswordExpire: Date | null;
 }
 
 export interface ProfilePicture {
   id: string;
+  urlId: string | null;
   url: string | null;
   userId: string;
 }
@@ -37,6 +40,6 @@ export interface Subscription {
 }
 
 export interface UserWithDetails extends User {
-  ProfilePicture: { id: string; url: string | null };
-  authProvider: { provider: ProviderName; providerId: string };
+  ProfilePicture: { urlId: string | null; url: string | null };
+  authProvider: { provider: ProviderName; providerId: string }[];
 }
