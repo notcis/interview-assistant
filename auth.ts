@@ -121,8 +121,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Remove sensitive information from the session
       delete session.user.password;
 
-      console.log("Session:", session);
-
       return session;
     },
   },
