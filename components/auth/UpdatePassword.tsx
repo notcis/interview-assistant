@@ -12,8 +12,6 @@ export default function UpdatePassword() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
 
-  const session = useSession();
-
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
 

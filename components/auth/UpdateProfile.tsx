@@ -8,6 +8,7 @@ import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
 import { UserWithDetails } from "@/interface";
 import { updateProfile } from "@/actions/auth.actions";
 import toast from "react-hot-toast";
+import Loader from "../layout/loader/Loader";
 
 export default function UpdateProfile() {
   const {
@@ -60,7 +61,7 @@ export default function UpdateProfile() {
   };
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
   return (
     <div className="flex h-full w-full items-center justify-center">
