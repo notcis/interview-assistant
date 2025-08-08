@@ -43,3 +43,14 @@ export interface UserWithDetails extends User {
   ProfilePicture: { urlId: string | null; url: string | null };
   authProvider: { provider: ProviderName; providerId: string }[];
 }
+
+export interface InterviewBody {
+  industry: string;
+  type: string;
+  topic: string;
+  role: string;
+  numOfQuestions: number;
+  difficulty: string;
+  duration: number;
+  userId: string;
+}

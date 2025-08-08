@@ -26,6 +26,7 @@ model User {
   authProvider        AuthProvider[]
   Subscription        Subscription[]
   ProfilePicture      ProfilePicture?
+  Interview           Interview[]
 }
 
 model ProfilePicture {
@@ -60,4 +61,82 @@ enum ProviderName {
   google
   github
   credentials
+}
+
+model Interview {
+  id             String                @id @default(uuid())
+  userId         String
+  industry       Industries
+  type           String
+  topic          String
+  role           String
+  nomOfQuestions Int
+  answered       Int                   @default(0)
+  difficulty     InterviewDifficulties
+  duration       Int
+  durationLeft   Int                   @default(0)
+  status         InterviewStatus       @default(pending)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Question Question[]
+}
+
+model Question {
+  id          String   @id @default(uuid())
+  interviewId String
+  question    String
+  answer      String?
+  completed   Boolean  @default(false)
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  result    Result?
+}
+
+model Result {
+  id           String @id @default(uuid())
+  questionId   String @unique
+  overallScore Int    @default(0)
+  clarity      Int    @default(0)
+  completeness Int    @default(0)
+  relevance    Int    @default(0)
+  suggestion   String @default("")
+
+  Question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+enum Industries {
+  Software_Development
+  Technology
+  Finance
+  Healthcare
+  Education
+  Retail
+  Manufacturing
+  Government
+  Consulting
+  Telecommunications
+  Energy
+}
+
+enum InterviewTypes {
+  Technical
+  Behavioral
+  Case_Study
+  In_Person
+}
+
+enum InterviewDifficulties {
+  Entry_Level
+  Mid_Level
+  Senior_Level
+}
+
+enum InterviewStatus {
+  pending
+  Completed
 }
