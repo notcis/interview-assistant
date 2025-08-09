@@ -1,19 +1,58 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { Form, Input, Select, SelectItem, Button } from "@heroui/react";
 import {
-  Form,
-  Input,
-  Select,
-  SelectItem,
-  Checkbox,
-  Button,
-} from "@heroui/react";
+  industryTopics,
+  interviewDifficulties,
+  interviewTypes,
+} from "@/constants/data";
+import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
+import { InterviewBody } from "@/interface";
+import { createInterview } from "@/actions/interview.action";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
+const interviewIndustries = Object.keys(industryTopics);
 
 export default function NewInterview() {
+  const [selectedIndustry, setSelectedIndustry] = useState("");
+  const [topics, setTopics] = useState<string[]>([]);
+
+  const router = useRouter();
+
+  const handleIndustryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const industry = event.target.value as keyof typeof industryTopics;
+    setSelectedIndustry(industry);
+    setTopics(industryTopics[industry] || []);
+  };
+
+  const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
+    const interviewData: InterviewBody = {
+      industry: data.industry,
+      topic: data.topic,
+      type: data.type,
+      role: data.role,
+      difficulty: data.difficulty,
+      numOfQuestions: Number(data.numOfQuestions),
+      duration: Number(data.duration),
+    };
+
+    const res = await createInterview(interviewData);
+
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    }
+
+    toast.success(res.message);
+    router.push("/app/interviews");
+  });
   return (
     <div className="p-4">
-      <Form validationBehavior="native">
+      <Form validationBehavior="native" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
           <div className="col-span-1">
             <h3 className="text-xl">Select all options below:</h3>
@@ -21,7 +60,12 @@ export default function NewInterview() {
 
           <div className="col-span-1">
             <div className="flex gap-4 max-w-sm justify-end items-center">
-              <Button color="primary" type="submit">
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={loading}
+                disabled={loading}
+              >
                 Create Interview
               </Button>
               <Button type="reset" variant="bordered">
@@ -41,8 +85,13 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="industry"
                   placeholder="Select Industry"
+                  onChange={handleIndustryChange}
                 >
-                  <SelectItem value={"industry"}>{"industry"}</SelectItem>
+                  {interviewIndustries.map((industry) => (
+                    <SelectItem key={industry} textValue={industry}>
+                      {industry}
+                    </SelectItem>
+                  ))}
                 </Select>
 
                 <Select
@@ -51,8 +100,13 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="topic"
                   placeholder="Select Topic"
+                  disabled={!selectedIndustry}
                 >
-                  <SelectItem value={"topic"}>{"topic"}</SelectItem>
+                  {topics.map((topic) => (
+                    <SelectItem key={topic} textValue={topic}>
+                      {topic}
+                    </SelectItem>
+                  ))}
                 </Select>
 
                 <Select
@@ -62,7 +116,11 @@ export default function NewInterview() {
                   name="type"
                   placeholder="Select interview type"
                 >
-                  <SelectItem value={"type"}>{"type"}</SelectItem>
+                  {interviewTypes.map((type) => (
+                    <SelectItem key={type} textValue={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
                 </Select>
 
                 <Input
@@ -86,7 +144,11 @@ export default function NewInterview() {
                   name="difficulty"
                   placeholder="Select difficulty"
                 >
-                  <SelectItem value={"difficulty"}>{"difficulty"}</SelectItem>
+                  {interviewDifficulties.map((difficulty) => (
+                    <SelectItem key={difficulty} textValue={difficulty}>
+                      {difficulty}
+                    </SelectItem>
+                  ))}
                 </Select>
 
                 <Input

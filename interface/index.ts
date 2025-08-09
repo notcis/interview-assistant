@@ -52,5 +52,63 @@ export interface InterviewBody {
   numOfQuestions: number;
   difficulty: string;
   duration: number;
+}
+
+export interface Interview {
+  id: string;
   userId: string;
+  industry: string;
+  type: string;
+  topic: string;
+  role: string;
+  numOfQuestions: number;
+  answered: number;
+  difficulty: string;
+  duration: number;
+  durationLeft: number;
+  status: string;
+  createdAt: Date;
+}
+
+export interface Question {
+  id: string;
+  interviewId: string;
+  question: string;
+  answer: string | null;
+  completed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Result {
+  id: string;
+  questionId: string;
+  overallScore: number;
+  clarity: number;
+  completeness: number;
+  relevance: number;
+  suggestion: string;
+}
+
+export interface ResultWithQuestionWithInterview extends Interview {
+  Question: {
+    id: string;
+    interviewId: string;
+    question: string;
+    answer: string | null;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    result:
+      | {
+          id: string;
+          questionId: string;
+          overallScore: number;
+          clarity: number;
+          completeness: number;
+          relevance: number;
+          suggestion: string;
+        }[]
+      | null;
+  }[];
 }

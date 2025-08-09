@@ -64,20 +64,20 @@ enum ProviderName {
 }
 
 model Interview {
-  id             String                @id @default(uuid())
+  id             String   @id @default(uuid())
   userId         String
-  industry       Industries
+  industry       String
   type           String
   topic          String
   role           String
-  nomOfQuestions Int
-  answered       Int                   @default(0)
-  difficulty     InterviewDifficulties
+  numOfQuestions Int
+  answered       Int      @default(0)
+  difficulty     String
   duration       Int
-  durationLeft   Int                   @default(0)
-  status         InterviewStatus       @default(pending)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
+  durationLeft   Int      @default(0)
+  status         String   @default("pending")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   Question Question[]
@@ -89,7 +89,6 @@ model Question {
   question    String
   answer      String?
   completed   Boolean  @default(false)
-  status      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -107,36 +106,4 @@ model Result {
   suggestion   String @default("")
 
   Question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-}
-
-enum Industries {
-  Software_Development
-  Technology
-  Finance
-  Healthcare
-  Education
-  Retail
-  Manufacturing
-  Government
-  Consulting
-  Telecommunications
-  Energy
-}
-
-enum InterviewTypes {
-  Technical
-  Behavioral
-  Case_Study
-  In_Person
-}
-
-enum InterviewDifficulties {
-  Entry_Level
-  Mid_Level
-  Senior_Level
-}
-
-enum InterviewStatus {
-  pending
-  Completed
 }

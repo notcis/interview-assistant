@@ -16,7 +16,6 @@ import {
 import { resetPasswordHTMLTemplate } from "@/utils/emailTemplate";
 import sendEmail from "@/utils/sendEmail";
 import crypto from "crypto";
-import { p } from "framer-motion/client";
 
 export const registerUser = async (
   name: string,
