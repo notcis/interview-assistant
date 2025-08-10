@@ -78,6 +78,7 @@ export interface Question {
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
+  result: Result | null;
 }
 
 export interface Result {
@@ -91,24 +92,5 @@ export interface Result {
 }
 
 export interface ResultWithQuestionWithInterview extends Interview {
-  Question: {
-    id: string;
-    interviewId: string;
-    question: string;
-    answer: string | null;
-    completed: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-    result:
-      | {
-          id: string;
-          questionId: string;
-          overallScore: number;
-          clarity: number;
-          completeness: number;
-          relevance: number;
-          suggestion: string;
-        }[]
-      | null;
-  }[];
+  Question: Question[];
 }

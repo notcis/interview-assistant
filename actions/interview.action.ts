@@ -145,3 +145,26 @@ export const deleteUserInterview = async (interviewId: string) => {
     };
   }
 };
+
+export const getInterviewById = async (interviewId: string) => {
+  const session = await auth();
+
+  if (!session || !session.user?.id) {
+    throw new Error("User not authenticated");
+  }
+
+  const interview = await prisma.interview.findUnique({
+    where: {
+      id: interviewId,
+    },
+    include: {
+      Question: {
+        include: {
+          result: true, // include Result ที่ join กับแต่ละ Question
+        },
+      },
+    },
+  });
+
+  return interview;
+};

@@ -1,12 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Progress, Button, Alert, Chip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import PromptInputWithBottomActions from "./PromptInputWithBottomActions";
+import { ResultWithQuestionWithInterview } from "@/interface";
+import { getFirstIncompleteQuestionIndex } from "@/helpers";
 
-export default function Interview() {
+export default function Interview({
+  interview,
+}: {
+  interview: ResultWithQuestionWithInterview | null;
+}) {
+  const initialQuestionIndex = getFirstIncompleteQuestionIndex(
+    interview?.Question || []
+  );
+
+  const [currentQuestionIndex, setCurrentQuestionIndex] =
+    useState(initialQuestionIndex);
+
+  const currentQuestion = interview?.Question[currentQuestionIndex];
+
   return (
     <div className="flex h-full w-full max-w-full flex-col gap-8">
       <Alert
@@ -50,7 +65,7 @@ export default function Interview() {
         <span
           className={`tracking-tight inline font-semibold bg-clip-text text-transparent bg-gradient-to-b from-[#FF1CF7] to-[#b249f8] text-[1.4rem] lg:text-2.5xl flex items-center justify-center h-full`}
         >
-          Question Here
+          {currentQuestion?.question}
         </span>
       </span>
 
