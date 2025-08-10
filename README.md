@@ -35,16 +35,21 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-# run file ts
+# run file ts ถา้มี .env ต้อง import
+
+```java
+import "dotenv/config";
+```
 
 ```bash
+npm install dotenv
 npx tsx test.ts
 ```
 
 # Prisma Setup
 
 ```bash
-npm install prisma @prisma/extension-accelerate --save-dev
+npm install prisma --save-dev
 
 npx prisma init
 npx prisma db push

@@ -20,7 +20,7 @@ export const industryTopics = {
     "React.js",
   ],
   Technology: ["AI & Machine Learning", "Cybersecurity", "Cloud Computing"],
-  Finance: ["Investment Banking", "Financial Analysis", "Accounting"],
+  Finance: ["Investment stock", "Financial Analysis", "Accounting"],
   Healthcare: ["Medical Research", "Healthcare Administration", "Nursing"],
   Education: ["Teaching", "Curriculum Development", "Educational Technology"],
   Retail: ["Sales", "Merchandising", "Customer Service"],
