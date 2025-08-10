@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { InterviewBody } from "@/interface";
 import { prisma } from "@/lib/prisma";
-import { generateQuestions } from "@/openai/openai";
+import { evaluateAnswer, generateQuestions } from "@/openai/openai";
 import { revalidatePath } from "next/cache";
 
 export const createInterview = async (body: InterviewBody) => {
@@ -147,12 +147,6 @@ export const deleteUserInterview = async (interviewId: string) => {
 };
 
 export const getInterviewById = async (interviewId: string) => {
-  const session = await auth();
-
-  if (!session || !session.user?.id) {
-    throw new Error("User not authenticated");
-  }
-
   const interview = await prisma.interview.findUnique({
     where: {
       id: interviewId,
@@ -160,11 +154,137 @@ export const getInterviewById = async (interviewId: string) => {
     include: {
       Question: {
         include: {
-          result: true, // include Result ที่ join กับแต่ละ Question
+          result: true,
         },
       },
     },
   });
 
   return interview;
+};
+
+export const updateInterview = async (
+  interviewId: string,
+  durationLeft: string | undefined,
+  questionId: string,
+  answer: string,
+  completed?: boolean
+) => {
+  const session = await auth();
+
+  if (!session || !session.user?.id) {
+    return {
+      success: false,
+      message: "User not authenticated",
+    };
+  }
+
+  try {
+    const interview = await prisma.interview.findUnique({
+      where: {
+        id: interviewId,
+      },
+      include: {
+        Question: {
+          include: {
+            result: true,
+          },
+        },
+      },
+    });
+
+    if (!interview) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      if (answer) {
+        const questionIndex = interview.Question.findIndex(
+          (q) => q.id === questionId
+        );
+        if (questionIndex === -1) {
+          return {
+            success: false,
+            message: "Question not found",
+          };
+        }
+
+        const question = interview.Question[questionIndex];
+
+        let overallScore = 0;
+        let relevance = 0;
+        let clarity = 0;
+        let completeness = 0;
+        let suggestion = "No suggestion provided";
+
+        if (answer !== "pass") {
+          ({ overallScore, relevance, clarity, completeness, suggestion } =
+            await evaluateAnswer(question.question, answer));
+        }
+
+        if (!question.completed) {
+          interview.answered += 1;
+        }
+
+        question.answer = answer;
+        question.completed = true;
+        interview.durationLeft = Number(durationLeft);
+
+        await tx.question.update({
+          where: {
+            id: questionId,
+          },
+          data: {
+            answer: question.answer,
+            completed: question.completed,
+            result: {
+              update: {
+                overallScore,
+                relevance,
+                clarity,
+                completeness,
+                suggestion,
+              },
+            },
+          },
+        });
+      }
+
+      if (interview.answered === interview.Question.length) {
+        interview.status = "completed";
+      }
+
+      if (durationLeft === "0") {
+        interview.durationLeft = Number(durationLeft);
+        interview.status = "completed";
+      }
+
+      if (completed) {
+        interview.status = "completed";
+      }
+
+      await tx.interview.update({
+        where: {
+          id: interviewId,
+        },
+        data: {
+          status: interview.status,
+          durationLeft: interview.durationLeft,
+        },
+      });
+    });
+
+    return {
+      success: true,
+      message: "Interview updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Failed to update interview",
+    };
+  }
 };

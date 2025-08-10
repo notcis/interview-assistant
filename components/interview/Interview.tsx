@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { Progress, Button, Alert, Chip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import PromptInputWithBottomActions from "./PromptInputWithBottomActions";
 import { ResultWithQuestionWithInterview } from "@/interface";
-import { getFirstIncompleteQuestionIndex } from "@/helpers";
+import { formatTime, getFirstIncompleteQuestionIndex } from "@/helpers";
+import toast from "react-hot-toast";
+import { updateInterview } from "@/actions/interview.action";
 
 export default function Interview({
   interview,
 }: {
   interview: ResultWithQuestionWithInterview | null;
 }) {
+  const [isPending, startTransition] = useTransition();
+
   const initialQuestionIndex = getFirstIncompleteQuestionIndex(
     interview?.Question || []
   );
@@ -20,15 +24,60 @@ export default function Interview({
   const [currentQuestionIndex, setCurrentQuestionIndex] =
     useState(initialQuestionIndex);
 
+  const [answer, setAnswer] = useState("");
+
+  const [timeLeft, setTimeLeft] = useState(interview?.durationLeft);
+  const [showAlert, setShowAlert] = useState(false);
+
   const currentQuestion = interview?.Question[currentQuestionIndex];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime: number | undefined) => {
+        if (prevTime === undefined) return undefined;
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        if (prevTime === 10) {
+          setShowAlert(true);
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleAnswerChange = (value: string) => {
+    setAnswer(value);
+  };
+
+  const saveAnswerToDB = async (questionId: string, answer: string) => {
+    startTransition(async () => {
+      const res = await updateInterview(
+        interview?.id!,
+        timeLeft?.toString(),
+        questionId,
+        answer
+      );
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+    });
+  };
 
   return (
     <div className="flex h-full w-full max-w-full flex-col gap-8">
-      <Alert
-        color="danger"
-        description={"Interview is about to exit"}
-        title={"Time up!"}
-      />
+      {showAlert && (
+        <Alert
+          color="danger"
+          description={"Interview is about to exit"}
+          title={"Time up!"}
+        />
+      )}
 
       <Progress
         aria-label="Interview Progress"
@@ -50,7 +99,7 @@ export default function Interview({
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center mb-5">
         <span className="text-lg font-semibold text-right mb-2 sm:mb-0">
-          Duration Left: 12:44
+          Duration Left: {formatTime(timeLeft)}
         </span>
         <Button
           color="danger"
@@ -69,7 +118,11 @@ export default function Interview({
         </span>
       </span>
 
-      <PromptInputWithBottomActions />
+      <PromptInputWithBottomActions
+        key={currentQuestionIndex}
+        value={answer}
+        onChange={handleAnswerChange}
+      />
 
       <div className="flex justify-between items-center mt-5">
         <Button
