@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { use, useEffect, useState, useTransition } from "react";
 import { Progress, Button, Alert, Chip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
@@ -15,6 +15,7 @@ import {
 } from "@/helpers";
 import toast from "react-hot-toast";
 import { updateInterview } from "@/actions/interview.action";
+import { useRouter } from "next/navigation";
 
 export default function Interview({
   interview,
@@ -22,6 +23,8 @@ export default function Interview({
   interview: ResultWithQuestionWithInterview | null;
 }) {
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   // Get the index of the first incomplete question
   const initialQuestionIndex = getFirstIncompleteQuestionIndex(
@@ -46,6 +49,12 @@ export default function Interview({
 
   // Get the current question
   const currentQuestion = interview?.Question[currentQuestionIndex];
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      handleExitInterview();
+    }
+  }, [timeLeft]);
 
   // Effect to set the initial answer from local storage
   useEffect(() => {
@@ -207,6 +216,28 @@ export default function Interview({
     }
   };
 
+  // Handle exiting the interview
+  const handleExitInterview = async () => {
+    // Start the transition
+    startTransition(async () => {
+      // Update the interview in the database
+      const res = await updateInterview(
+        interview?.id!,
+        timeLeft?.toString(),
+        currentQuestion?.id || "",
+        answer,
+        true
+      );
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      router.push("/app/interviews");
+    });
+  };
+
   return (
     <div className="flex h-full w-full max-w-full flex-col gap-8">
       {showAlert && (
@@ -253,6 +284,9 @@ export default function Interview({
           color="danger"
           startContent={<Icon icon="solar:exit-outline" fontSize={18} />}
           variant="solid"
+          onPress={handleExitInterview}
+          isDisabled={isPending}
+          isLoading={isPending}
         >
           Save & Exit Interview
         </Button>

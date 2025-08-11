@@ -96,7 +96,7 @@ export default function ListInterviews({ interviews }: ListInterviewsProps) {
                 </Button>
               ) : (
                 <div className="relative flex items-center gap-2">
-                  {interview.status === "completed" && (
+                  {interview.status !== "completed" && (
                     <Tooltip color="danger" content="Continue Interview">
                       <span className="text-lg text-danger cursor-pointer active:opacity-50">
                         <Icon
