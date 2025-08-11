@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { pageIcons } from "@/constants/page";
 import { Question } from "@/interface";
 
@@ -8,6 +9,28 @@ export function getPageIconAndPath(pathname: string): {
 } {
   return pageIcons[pathname];
 }
+
+// Get reset password token
+export const getResetPasswordToken = () => {
+  // Generate a random reset token
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  // Hash the reset token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set expiration for the reset token
+  const resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+  // Return the reset token, hashed token, and expiration
+  return {
+    resetToken,
+    resetPasswordToken,
+    resetPasswordExpire,
+  };
+};
 
 // Get the index of the first incomplete question
 export function getFirstIncompleteQuestionIndex(questions: Question[]): number {
@@ -34,3 +57,48 @@ export function formatTime(seconds: number | undefined): string {
     remainingSeconds
   ).padStart(2, "0")}`;
 }
+
+// Save answer to local storage
+export const saveAnswerToLocalStorage = (
+  interviewId: string,
+  questionId: string,
+  answer: string
+) => {
+  // Construct the key and store the answer in local storage
+  const key = `interview-${interviewId}-answers`;
+
+  // Get the existing answers from local storage
+  const storedAnswers = JSON.parse(localStorage.getItem(key) || "{}");
+
+  // Update the answer for the specific question
+  storedAnswers[questionId] = answer;
+
+  // Save the updated answers back to local storage
+  localStorage.setItem(key, JSON.stringify(storedAnswers));
+};
+
+// Get answer from local storage
+export const getAnswerFromLocalStorage = (
+  interviewId: string,
+  questionId: string
+) => {
+  // Construct the key and retrieve the answers from local storage
+  const key = `interview-${interviewId}-answers`;
+
+  // Get the existing answers from local storage
+  const storedAnswers = JSON.parse(localStorage.getItem(key) || "{}");
+
+  // Return the answer for the specific question
+  return storedAnswers[questionId] || "";
+};
+
+export const getAnswersFromLocalStorage = (interviewId: string) => {
+  // Construct the key and retrieve the answers from local storage
+  const key = `interview-${interviewId}-answers`;
+
+  // Get the existing answers from local storage
+  const storedAnswers = localStorage.getItem(key);
+
+  // Return the answer for the specific question
+  return storedAnswers ? JSON.parse(storedAnswers) : null;
+};

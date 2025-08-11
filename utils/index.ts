@@ -1,5 +1,4 @@
 // utils/index.ts
-import crypto from "crypto";
 
 // Utility functions for error handling and async operations
 export function formatError(error: any) {
@@ -79,20 +78,3 @@ export const catchAsyncErrors =
       };
     }
   };
-
-export const getResetPasswordToken = () => {
-  const resetToken = crypto.randomBytes(20).toString("hex");
-
-  const resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-  const resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
-
-  return {
-    resetToken,
-    resetPasswordToken,
-    resetPasswordExpire,
-  };
-};

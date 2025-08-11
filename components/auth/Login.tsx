@@ -107,7 +107,7 @@ export default function Login() {
             className="w-full"
             color="primary"
             type="submit"
-            disabled={loading}
+            isDisabled={loading}
             isLoading={loading}
           >
             Sign In

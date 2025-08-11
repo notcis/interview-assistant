@@ -102,7 +102,7 @@ export default function ResetPassword({ token }: { token: string }) {
             type="submit"
             endContent={<Icon icon="akar-icons:arrow-right" />}
             isLoading={loading}
-            disabled={loading}
+            isDisabled={loading}
           >
             Reset
           </Button>

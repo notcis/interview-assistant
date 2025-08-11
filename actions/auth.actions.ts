@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { ProviderName } from "@/interface";
-import { formatError, getResetPasswordToken } from "@/utils";
+import { formatError } from "@/utils";
 import bcrypt from "bcryptjs";
 import { delete_file, upload_file } from "@/utils/cloudinary";
 import { auth } from "@/auth";
@@ -16,6 +16,7 @@ import {
 import { resetPasswordHTMLTemplate } from "@/utils/emailTemplate";
 import sendEmail from "@/utils/sendEmail";
 import crypto from "crypto";
+import { getResetPasswordToken } from "@/helpers";
 
 export const registerUser = async (
   name: string,

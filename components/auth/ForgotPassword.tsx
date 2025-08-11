@@ -54,7 +54,7 @@ export default function ForgotPassword() {
             type="submit"
             endContent={<Icon icon="akar-icons:arrow-right" />}
             isLoading={loading}
-            disabled={loading}
+            isDisabled={loading}
           >
             Send
           </Button>
