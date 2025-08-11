@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { evaluateAnswer, generateQuestions } from "@/openai/openai";
 import { revalidatePath } from "next/cache";
 
+// Create Interview
 export const createInterview = async (body: InterviewBody) => {
   const { industry, type, topic, role, numOfQuestions, difficulty, duration } =
     body;
@@ -92,6 +93,7 @@ export const createInterview = async (body: InterviewBody) => {
   }
 };
 
+// Get User Interviews
 export const getInterviews = async () => {
   const session = await auth();
 
@@ -115,6 +117,7 @@ export const getInterviews = async () => {
   return interviews;
 };
 
+// Delete User Interview
 export const deleteUserInterview = async (interviewId: string) => {
   // ตรวจสอบการเข้าสู่ระบบ
   const session = await auth();
@@ -146,6 +149,7 @@ export const deleteUserInterview = async (interviewId: string) => {
   }
 };
 
+// Get Interview by ID
 export const getInterviewById = async (interviewId: string) => {
   const interview = await prisma.interview.findUnique({
     where: {
@@ -205,8 +209,6 @@ export const updateInterview = async (
       };
     }
 
-    // Update the interview
-    //await prisma.$transaction(async (tx) => {
     // Update the question
     if (answer) {
       // Find the question
@@ -242,10 +244,14 @@ export const updateInterview = async (
         interview.answered += 1;
       }
 
+      // Update question
       question.answer = answer;
       question.completed = true;
+
+      // Update interview duration
       interview.durationLeft = Number(durationLeft);
 
+      // Update the question and result in the database
       await prisma.question.update({
         where: {
           id: questionId,
@@ -270,19 +276,23 @@ export const updateInterview = async (
       });
     }
 
+    // Check if all questions have been answered
     if (interview.answered === interview.Question.length) {
       interview.status = "completed";
     }
 
+    // Check if the duration has run out
     if (durationLeft === "0") {
       interview.durationLeft = Number(durationLeft);
       interview.status = "completed";
     }
 
+    // Check if the interview is completed
     if (completed) {
       interview.status = "completed";
     }
 
+    // Update the interview in the database
     await prisma.interview.update({
       where: {
         id: interviewId,
@@ -293,7 +303,6 @@ export const updateInterview = async (
         answered: interview.answered,
       },
     });
-    // });
 
     return {
       success: true,

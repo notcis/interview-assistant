@@ -5,6 +5,18 @@ import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import PromptInput from "./PromptInput";
+import toast from "react-hot-toast";
+
+declare global {
+  interface Window {
+    speechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
+const speechRecognition =
+  typeof window !== "undefined" &&
+  (window.speechRecognition || window.webkitSpeechRecognition);
 
 export default function PromptInputWithBottomActions({
   value,
@@ -20,6 +32,29 @@ export default function PromptInputWithBottomActions({
   const handleValueChange = (value: string) => {
     setPrompt(value);
     onChange(value);
+  };
+
+  const handleVoiceInput = () => {
+    if (!speechRecognition) {
+      toast.error("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new speechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "th-TH";
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      handleValueChange(prompt + " " + transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.log("Error occurred in recognition: " + event.error);
+    };
+
+    recognition.start();
   };
 
   return (
@@ -49,6 +84,7 @@ export default function PromptInputWithBottomActions({
                 />
               }
               variant="flat"
+              onPress={handleVoiceInput}
             >
               Type with Voice
             </Button>

@@ -11,6 +11,8 @@ import {
   PolarAngleAxis,
 } from "recharts";
 import { Card, cn } from "@heroui/react";
+import { ResultWithQuestionWithInterview } from "@/interface";
+import { calculateAverageScore, calculateDuration } from "@/helpers";
 
 interface CircleChartProps {
   title: string;
@@ -24,17 +26,27 @@ interface CircleChartProps {
   }[];
 }
 
-export default function ResultTable() {
+export default function ResultTable({
+  interview,
+}: {
+  interview: ResultWithQuestionWithInterview;
+}) {
+  const averageScore = calculateAverageScore(interview.Question);
+  const durationData = calculateDuration(
+    interview.duration,
+    interview.durationLeft
+  );
+
   const data: CircleChartProps[] = [
     {
       title: "Questions",
       color: "default",
-      total: 3,
-      strValue: `1 / 3`,
+      total: interview.numOfQuestions,
+      strValue: `${interview.answered} / ${interview.numOfQuestions}`,
       chartData: [
         {
           name: "Questions",
-          value: 2,
+          value: interview.answered,
           fill: "hsl(var(--heroui-primary))",
         },
       ],
@@ -43,11 +55,11 @@ export default function ResultTable() {
       title: "Result",
       color: "success",
       total: 10,
-      strValue: `4 / 10`,
+      strValue: `${averageScore} / 10`,
       chartData: [
         {
           name: "Result",
-          value: 4,
+          value: parseFloat(averageScore.toString()),
           fill: "hsl(var(--heroui-success))",
         },
       ],
@@ -55,12 +67,12 @@ export default function ResultTable() {
     {
       title: "Duration",
       color: "warning",
-      total: 34,
-      strValue: "34",
+      total: durationData.total,
+      strValue: durationData.strValue,
       chartData: [
         {
           name: "Time",
-          value: 34,
+          value: durationData.chartDataValue,
           fill: "hsl(var(--heroui-warning))",
         },
       ],
@@ -69,11 +81,16 @@ export default function ResultTable() {
       title: "Difficulty",
       color: "danger",
       total: 3,
-      strValue: "3",
+      strValue: interview.difficulty,
       chartData: [
         {
           name: "Difficulty",
-          value: 3,
+          value:
+            interview.difficulty === "Entry Level"
+              ? 1
+              : interview.difficulty === "Mid Level"
+              ? 2
+              : 3,
           fill: "hsl(var(--heroui-danger))",
         },
       ],
@@ -81,13 +98,17 @@ export default function ResultTable() {
   ];
 
   return (
-    <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 mt-5">
       {data.map((item, index) => (
         <CircleChartCard key={index} {...item} />
       ))}
     </div>
   );
 }
+
+const formatTotal = (value?: number | undefined) => {
+  return value?.toLocaleString() ?? "0";
+};
 
 const CircleChartCard: React.FC<CircleChartProps> = ({
   title,
@@ -159,7 +180,7 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
                   dy="1.5em"
                   x="50%"
                 >
-                  total
+                  {strValue ?? formatTotal(total)}
                 </tspan>
               </text>
             </g>

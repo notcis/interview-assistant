@@ -102,3 +102,24 @@ export const getAnswersFromLocalStorage = (interviewId: string) => {
   // Return the answer for the specific question
   return storedAnswers ? JSON.parse(storedAnswers) : null;
 };
+
+export const calculateAverageScore = (questions: Question[]) => {
+  if (!questions || questions.length === 0) return 0;
+
+  const totalScore = questions.reduce((acc, question) => {
+    return acc + (question.result?.overallScore || 0);
+  }, 0);
+
+  return (totalScore / questions.length).toFixed(1);
+};
+
+export const calculateDuration = (duration: number, durationLeft: number) => {
+  const durationUsedMinutes = ((duration - durationLeft) / 60).toFixed(0);
+  const totalDurationInMinutes = (duration / 60).toFixed(0);
+
+  return {
+    strValue: `${durationUsedMinutes} / ${totalDurationInMinutes} min`,
+    total: parseInt(totalDurationInMinutes),
+    chartDataValue: parseFloat(durationUsedMinutes),
+  };
+};

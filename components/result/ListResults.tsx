@@ -1,5 +1,6 @@
 "use client";
 
+import { ResultWithQuestionWithInterview } from "@/interface";
 import React from "react";
 import {
   Table,
@@ -13,12 +14,9 @@ import {
   Button,
 } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { ResultWithQuestionWithInterview } from "@/interface";
-import { Key } from "@react-types/shared";
-import { deleteUserInterview } from "@/actions/interview.action";
-import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Key } from "@react-types/shared";
 import { calculateAverageScore } from "@/helpers";
 
 export const columns = [
@@ -28,21 +26,12 @@ export const columns = [
   { name: "ACTIONS", uid: "actions" },
 ];
 
-interface ListInterviewsProps {
-  interviews: ResultWithQuestionWithInterview[] | [];
-}
-
-export default function ListInterviews({ interviews }: ListInterviewsProps) {
+export default function ListResults({
+  interviews,
+}: {
+  interviews: ResultWithQuestionWithInterview[];
+}) {
   const router = useRouter();
-
-  const deleteInterviewHandle = async (interviewId: string) => {
-    const res = await deleteUserInterview(interviewId);
-    if (!res.success) {
-      toast.error(res.message);
-      return;
-    }
-    toast.success(res.message);
-  };
 
   const renderCell = React.useCallback(
     (interview: ResultWithQuestionWithInterview, columnKey: Key) => {
@@ -82,50 +71,21 @@ export default function ListInterviews({ interviews }: ListInterviewsProps) {
             </Chip>
           );
         case "actions":
-          return (
-            <>
-              {interview.answered === 0 && interview.status !== "completed" ? (
-                <Button
-                  className="bg-foreground font-medium text-background"
-                  color="secondary"
-                  endContent={
-                    <Icon icon="solar:arrow-right-linear" fontSize={20} />
-                  }
-                  variant="flat"
-                  as={Link}
-                  href={`/app/interviews/conduct/${interview.id}`}
-                >
-                  Start
-                </Button>
-              ) : (
-                <div className="relative flex justify-center items-center gap-2">
-                  {interview.status !== "completed" && (
-                    <Tooltip color="danger" content="Continue Interview">
-                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <Icon
-                          icon="solar:round-double-alt-arrow-right-bold"
-                          fontSize={22}
-                          onClick={() =>
-                            router.push(
-                              `/app/interviews/conduct/${interview.id}`
-                            )
-                          }
-                        />
-                      </span>
-                    </Tooltip>
-                  )}
-                  <Tooltip color="danger" content="Delete Interview">
-                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                      <Icon
-                        icon="solar:trash-bin-trash-outline"
-                        fontSize={21}
-                        onClick={() => deleteInterviewHandle(interview.id)}
-                      />
-                    </span>
-                  </Tooltip>
-                </div>
-              )}
-            </>
+          return interview.status === "completed" ? (
+            <Button
+              className="bg-foreground font-medium text-background"
+              color="secondary"
+              endContent={
+                <Icon icon="solar:arrow-right-linear" fontSize={20} />
+              }
+              variant="flat"
+              as={Link}
+              href={`/app/results/${interview.id}`}
+            >
+              View Results
+            </Button>
+          ) : (
+            <p>Complete interview to view results</p>
           );
         default:
           cellValue;
