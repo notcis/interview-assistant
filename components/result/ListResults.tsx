@@ -12,12 +12,15 @@ import {
   Chip,
   Tooltip,
   Button,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Key } from "@react-types/shared";
 import { calculateAverageScore } from "@/helpers";
+import CustomPagination from "../layout/pagination/CustomPagination";
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
@@ -28,8 +31,10 @@ export const columns = [
 
 export default function ListResults({
   interviews,
+  totalPages,
 }: {
   interviews: ResultWithQuestionWithInterview[];
+  totalPages: number;
 }) {
   const router = useRouter();
 
@@ -94,8 +99,36 @@ export default function ListResults({
     []
   );
 
+  let queryParams;
+
+  const handleStatusChange = (status: string) => {
+    queryParams = new URLSearchParams(window.location.search);
+    if (queryParams.has("status") && status === "all") {
+      queryParams.delete("status");
+    } else if (queryParams.has("status")) {
+      queryParams.set("status", status);
+    } else {
+      queryParams.append("status", status);
+    }
+
+    const path = `${window.location.pathname}?${queryParams.toString()}`;
+    router.push(path);
+  };
+
   return (
     <div className="my-4">
+      <div className="flex justify-end items-center mb-4">
+        <Select
+          size="sm"
+          className="max-w-xs"
+          label="Select a status"
+          onChange={(event) => handleStatusChange(event.target.value)}
+        >
+          <SelectItem key="all">ALL</SelectItem>
+          <SelectItem key="pending">PENDING</SelectItem>
+          <SelectItem key="completed">COMPLETED</SelectItem>
+        </Select>
+      </div>
       <Table aria-label="Interviews Table">
         <TableHeader columns={columns}>
           {(column) => (
@@ -117,6 +150,9 @@ export default function ListResults({
           )}
         </TableBody>
       </Table>
+      <div className=" flex justify-center items-center mt-10">
+        <CustomPagination totalPages={totalPages} />
+      </div>
     </div>
   );
 }

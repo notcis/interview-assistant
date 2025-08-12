@@ -45,7 +45,7 @@ export default function ResultTable({
       strValue: `${interview.answered} / ${interview.numOfQuestions}`,
       chartData: [
         {
-          name: "Questions",
+          name: "จำนวนคำถาม",
           value: interview.answered,
           fill: "hsl(var(--heroui-primary))",
         },
@@ -58,7 +58,7 @@ export default function ResultTable({
       strValue: `${averageScore} / 10`,
       chartData: [
         {
-          name: "Result",
+          name: "ผลลัพธ์",
           value: parseFloat(averageScore.toString()),
           fill: "hsl(var(--heroui-success))",
         },
@@ -71,7 +71,7 @@ export default function ResultTable({
       strValue: durationData.strValue,
       chartData: [
         {
-          name: "Time",
+          name: "เวลา",
           value: durationData.chartDataValue,
           fill: "hsl(var(--heroui-warning))",
         },
@@ -84,7 +84,7 @@ export default function ResultTable({
       strValue: interview.difficulty,
       chartData: [
         {
-          name: "Difficulty",
+          name: "ความยาก",
           value:
             interview.difficulty === "Entry Level"
               ? 1

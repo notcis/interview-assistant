@@ -1,5 +1,4 @@
 import { getInterviewById } from "@/actions/interview.action";
-import Interview from "@/components/interview/Interview";
 import ResultDetails from "@/components/result/ResultDetails";
 import { ResultWithQuestionWithInterview } from "@/interface";
 

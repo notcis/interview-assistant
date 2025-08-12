@@ -1,6 +1,8 @@
 "use server";
 
+import { Prisma } from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { LIST_PER_PAGE } from "@/constants/constants";
 import { InterviewBody } from "@/interface";
 import { prisma } from "@/lib/prisma";
 import { evaluateAnswer, generateQuestions } from "@/openai/openai";
@@ -94,27 +96,62 @@ export const createInterview = async (body: InterviewBody) => {
 };
 
 // Get User Interviews
-export const getInterviews = async () => {
+export const getInterviews = async ({
+  filter,
+  page = 1,
+}: {
+  filter: { status?: string };
+  page?: number;
+}) => {
+  // ตรวจสอบการเข้าสู่ระบบ
   const session = await auth();
 
   if (!session || !session.user?.id) {
     throw new Error("User not authenticated");
   }
 
-  const interviews = await prisma.interview.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    include: {
-      Question: {
-        include: {
-          result: true, // include Result ที่ join กับแต่ละ Question
+  const filterStatus: Prisma.InterviewWhereInput = filter.status
+    ? { status: filter.status }
+    : {};
+
+  const skip = (page - 1) * LIST_PER_PAGE;
+  const take = LIST_PER_PAGE;
+
+  // ค้นหาสัมภาษณ์แบบมี pagination
+  const [interviews, total] = await Promise.all([
+    prisma.interview.findMany({
+      where: {
+        userId: session.user.id,
+        ...filterStatus,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take,
+      include: {
+        Question: {
+          include: {
+            result: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.interview.count({
+      where: {
+        userId: session.user.id,
+        ...filterStatus,
+      },
+    }),
+  ]);
 
-  return interviews;
+  return {
+    interviews,
+    pagination: {
+      page,
+      totalPages: Math.ceil(total / LIST_PER_PAGE),
+    },
+  };
 };
 
 // Delete User Interview

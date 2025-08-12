@@ -123,3 +123,39 @@ export const calculateDuration = (duration: number, durationLeft: number) => {
     chartDataValue: parseFloat(durationUsedMinutes),
   };
 };
+
+// Get the total number of pages
+export const getTotalPages = (
+  totalQuestions: number,
+  questionsPerPage: number
+) => {
+  // Calculate the total number of pages
+  return Math.ceil(totalQuestions / questionsPerPage);
+};
+
+// Paginate the data array
+export const paginate = <T>(
+  data: T[],
+  currentPage: number,
+  itemsPerPage: number
+): T[] => {
+  // Paginate the data array
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  // Calculate the end index
+  const endIndex = startIndex + itemsPerPage;
+  // Return the paginated data
+  return data.slice(startIndex, endIndex);
+};
+
+export const updateSearchParams = (
+  queryParams: URLSearchParams,
+  key: string,
+  value: string
+) => {
+  if (queryParams.has(key)) {
+    queryParams.set(key, value);
+  } else {
+    queryParams.append(key, value);
+  }
+  return queryParams;
+};

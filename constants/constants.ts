@@ -82,3 +82,7 @@ export const testimonials = [
       "Prep AI was very useful in preparing for my interviews. The practice sessions helped me gain confidence.",
   },
 ];
+
+// Constants for pagination
+export const QUESTIONS_PER_PAGE = 5;
+export const LIST_PER_PAGE = 2;

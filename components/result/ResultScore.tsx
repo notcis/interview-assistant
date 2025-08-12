@@ -2,27 +2,28 @@
 
 import React from "react";
 import { Card, Progress } from "@heroui/react";
+import { Result } from "@/interface";
 
-export default function ResultScore() {
+export default function ResultScore({ result }: { result: Result | null }) {
   const data = [
     {
-      title: "Overall Score",
-      value: 5,
+      title: "คะแนนรวม",
+      value: result?.overallScore,
       status: "good",
     },
     {
-      title: "Clarity",
-      value: 4,
+      title: "ความชัดเจน",
+      value: result?.clarity,
       status: "warn",
     },
     {
-      title: "Relevance",
-      value: 4,
+      title: "ความเกี่ยวข้อง",
+      value: result?.relevance,
       status: "warn",
     },
     {
-      title: "Completeness",
-      value: 6,
+      title: "ความสมบูรณ์",
+      value: result?.completeness,
       status: "warn",
     },
   ];
@@ -46,7 +47,7 @@ export default function ResultScore() {
             size="sm"
             className="mt-2"
             color={item.status === "good" ? "success" : "warning"}
-            value={item.value * 10}
+            value={item.value ? item.value * 10 : 0}
           />
         </Card>
       ))}
