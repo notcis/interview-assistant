@@ -24,7 +24,7 @@ model User {
   resetPasswordToken  String?
   resetPasswordExpire DateTime?
   authProvider        AuthProvider[]
-  Subscription        Subscription[]
+  Subscription        Subscription?
   ProfilePicture      ProfilePicture?
   Interview           Interview[]
 }
@@ -47,7 +47,7 @@ model AuthProvider {
 
 model Subscription {
   id                 String   @id @default(uuid())
-  userId             String
+  userId             String   @unique
   customerId         String
   created            DateTime @default(now())
   status             String

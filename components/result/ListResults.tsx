@@ -150,9 +150,11 @@ export default function ListResults({
           )}
         </TableBody>
       </Table>
-      <div className=" flex justify-center items-center mt-10">
-        <CustomPagination totalPages={totalPages} />
-      </div>
+      {totalPages > 1 && (
+        <div className=" flex justify-center items-center mt-10">
+          <CustomPagination totalPages={totalPages} />
+        </div>
+      )}
     </div>
   );
 }
