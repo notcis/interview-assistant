@@ -41,7 +41,7 @@ export default function Home() {
           as={Link}
           href="/subscribe"
         >
-          Try Prep AI Now
+          Try Interview Assistant Now
         </Button>
         <a href="#pricing">
           <Button

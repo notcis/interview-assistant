@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Assistant Chat",
+  name: "Interview Assistant",
   description:
-    "A Next.js application that provides an AI-powered chat assistant.",
+    "A Next.js application that provides an AI-powered interview assistant.",
 };

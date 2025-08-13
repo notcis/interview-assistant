@@ -65,7 +65,7 @@ export const generateQuestions = async (
     messages: [
       {
         role: "system",
-        content: `You are expert in generating questions tailored to specific roles, industries, experience levels and topic. You responses should be professional, concise and well-structured. generate to thai language. `,
+        content: `You are expert in generating questions tailored to specific roles, industries, experience levels and topic. You responses should be professional, concise and well-structured. respond in thai language. `,
       },
       {
         role: "user",
@@ -124,7 +124,7 @@ export const evaluateAnswer = async (question: string, answer: string) => {
     messages: [
       {
         role: "system",
-        content: `You are an expert evaluator with a strong understanding of assessing answers to interview questions. generate to thai language. `,
+        content: `You are an expert evaluator with a strong understanding of assessing answers to interview questions. respond in thai language. `,
       },
       {
         role: "user",

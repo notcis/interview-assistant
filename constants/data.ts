@@ -55,15 +55,43 @@ export const industryTopics = {
   Energy: ["Renewable Energy", "Oil & Gas", "Energy Management"],
 };
 
-export const interviewTypes = [
+/* export const interviewTypes = [
   "Technical",
   "Behavioral",
   "Case Study",
   "In-Person",
+]; */
+
+export const interviewTypes = [
+  {
+    value: "Technical",
+    label: "ทางเทคนิค",
+  },
+  {
+    value: "Behavioral",
+    label: "พฤติกรรม",
+  },
+  {
+    value: "Case Study",
+    label: "กรณีศึกษา",
+  },
+  {
+    value: "In-Person",
+    label: "สัมภาษณ์แบบตัวต่อตัว",
+  },
 ];
 
 export const interviewDifficulties = [
-  "Entry Level",
-  "Mid Level",
-  "Senior Level",
+  {
+    value: "Entry Level",
+    label: "ระดับเริ่มต้น",
+  },
+  {
+    value: "Mid Level",
+    label: "ระดับกลาง",
+  },
+  {
+    value: "Senior Level",
+    label: "ระดับอาวุโส",
+  },
 ];

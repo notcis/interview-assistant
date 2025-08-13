@@ -62,7 +62,7 @@ const Navbar = () => {
                 as={Link}
                 href="/subscribe"
               >
-                Subscribe for $9.99
+                Subscribe for ฿99.00
               </Button>
             </NavbarItem>
             <NavbarItem className="hidden sm:flex">

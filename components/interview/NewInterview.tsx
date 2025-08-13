@@ -81,10 +81,10 @@ export default function NewInterview() {
               <div className="flex flex-col gap-4 w-full max-w-sm">
                 <Select
                   isRequired
-                  label="Industry"
+                  label="อุตสาหกรรม"
                   labelPlacement="outside"
                   name="industry"
-                  placeholder="Select Industry"
+                  placeholder="เลือกอุตสาหกรรม"
                   onChange={handleIndustryChange}
                 >
                   {interviewIndustries.map((industry) => (
@@ -96,10 +96,10 @@ export default function NewInterview() {
 
                 <Select
                   isRequired
-                  label="Topic"
+                  label="หัวข้อ"
                   labelPlacement="outside"
                   name="topic"
-                  placeholder="Select Topic"
+                  placeholder="เลือกหัวข้อ"
                   disabled={!selectedIndustry}
                 >
                   {topics.map((topic) => (
@@ -111,14 +111,14 @@ export default function NewInterview() {
 
                 <Select
                   isRequired
-                  label="Interview Type"
+                  label="ประเภทสัมภาษณ์"
                   labelPlacement="outside"
                   name="type"
-                  placeholder="Select interview type"
+                  placeholder="เลือกประเภทสัมภาษณ์"
                 >
                   {interviewTypes.map((type) => (
-                    <SelectItem key={type} textValue={type}>
-                      {type}
+                    <SelectItem key={type.value} textValue={type.value}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </Select>
@@ -126,7 +126,7 @@ export default function NewInterview() {
                 <Input
                   isRequired
                   type="text"
-                  label="Job Role"
+                  label="ตำแหน่งงาน"
                   labelPlacement="outside"
                   name="role"
                   placeholder="software developer, data scientist, etc."
@@ -139,14 +139,17 @@ export default function NewInterview() {
               <div className="flex flex-col gap-4 w-full max-w-sm">
                 <Select
                   isRequired
-                  label="Difficulty"
+                  label="ระดับความยาก"
                   labelPlacement="outside"
                   name="difficulty"
-                  placeholder="Select difficulty"
+                  placeholder="เลือกระดับความยาก"
                 >
                   {interviewDifficulties.map((difficulty) => (
-                    <SelectItem key={difficulty} textValue={difficulty}>
-                      {difficulty}
+                    <SelectItem
+                      key={difficulty.value}
+                      textValue={difficulty.value}
+                    >
+                      {difficulty.label}
                     </SelectItem>
                   ))}
                 </Select>
@@ -154,19 +157,19 @@ export default function NewInterview() {
                 <Input
                   isRequired
                   type="number"
-                  label="No of Question"
+                  label="จำนวนคำถาม"
                   labelPlacement="outside"
                   name="numOfQuestions"
-                  placeholder="Enter no of questions"
+                  placeholder="กรุณากรอกจำนวนคำถาม"
                 />
 
                 <Input
                   isRequired
                   type="number"
-                  label="Duration"
+                  label="ระยะเวลา"
                   labelPlacement="outside"
                   name="duration"
-                  placeholder="Enter duration"
+                  placeholder="กรุณากรอกระยะเวลา"
                 />
               </div>
             </div>
