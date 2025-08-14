@@ -46,15 +46,15 @@ model AuthProvider {
 }
 
 model Subscription {
-  id                 String   @id @default(uuid())
-  userId             String   @unique
+  id                 String    @id @default(uuid())
+  userId             String    @unique
   customerId         String
-  created            DateTime @default(now())
+  created            DateTime  @default(now())
   status             String
   startDate          DateTime
   currentPeriodEnd   DateTime
-  nextPaymentAttempt DateTime
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nextPaymentAttempt DateTime?
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum ProviderName {
