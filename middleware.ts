@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { isUserAdmin, isUserSubscribed } from "./auth-guard";
 
 export default async function middleware(request: NextRequest) {
   // Check if the request has a valid token
@@ -17,9 +18,12 @@ export default async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
+  const IsSubscribed = isUserSubscribed(token?.user as any);
+  const IsAdmin = isUserAdmin(token?.user as any);
+
   // If the path is protected and no token is found, redirect to login
-  if (isProtectedPath && !token) {
-    const url = new URL("/login", request.url);
+  if (isProtectedPath && !IsSubscribed && !IsAdmin) {
+    const url = new URL("/", request.url);
     return NextResponse.redirect(url);
   }
 

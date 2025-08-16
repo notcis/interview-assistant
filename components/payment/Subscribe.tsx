@@ -31,7 +31,7 @@ const Subscribe = () => {
 };
 
 const CheckoutForm = () => {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const stripe = useStripe();
@@ -81,8 +81,22 @@ const CheckoutForm = () => {
           return;
         }
 
-        toast.success("Subscription created successfully!");
-        router.push("/app/dashboard");
+        if (!res.subscription) {
+          setError("Failed to create subscription");
+          return;
+        }
+
+        const updateSession = await update({
+          Subscription: {
+            id: res.subscription.id,
+            status: res.subscription.status,
+          },
+        });
+
+        if (updateSession) {
+          toast.success("Subscription created successfully!");
+          router.push("/app/dashboard");
+        }
 
         // Handle successful subscription creation
       } catch (error: any) {

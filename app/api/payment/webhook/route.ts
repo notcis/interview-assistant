@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   switch (event.type) {
     case "invoice.payment_succeeded":
-      const invoice = event.data.object;
+      /*      const invoice = event.data.object;
       const email = invoice.customer_email;
       const customer = await stripe.customers.retrieve(
         invoice.customer as string
@@ -38,31 +38,42 @@ export async function POST(req: Request) {
       if (!user) {
         return new Response("User not found", { status: 404 });
       }
-      await prisma.subscription.create({
-        data: {
-          userId: user.id,
+      await prisma.subscription.upsert({
+        where: { userId: user.id },
+        update: {
           id: invoice.id,
+          userId: user.id,
           customerId: customer.id,
           status: "active",
           created: new Date(invoice.created * 1000),
           startDate: new Date(invoice.lines.data[0].period.start * 1000),
           currentPeriodEnd: new Date(invoice.lines.data[0].period.end * 1000),
         },
-      });
+        create: {
+          id: invoice.id,
+          userId: user.id,
+          customerId: customer.id,
+          status: "active",
+          created: new Date(invoice.created * 1000),
+          startDate: new Date(invoice.lines.data[0].period.start * 1000),
+          currentPeriodEnd: new Date(invoice.lines.data[0].period.end * 1000),
+        },
+      }); */
 
       break;
     case "invoice.payment_failed":
-      const paymentFailed = event.data.object;
+      /*     const paymentFailed = event.data.object;
+
       const nextpaymentAttempt = paymentFailed.next_payment_attempt;
       await prisma.subscription.update({
-        where: { id: paymentFailed.id },
+        where: { id: paymentFailed.id as string },
         data: {
           status: "past_due",
           nextPaymentAttempt: nextpaymentAttempt
             ? new Date(nextpaymentAttempt * 1000)
             : null,
         },
-      });
+      }); */
       break;
     case "customer.subscription.deleted":
       const subscriptionDelete = event.data.object;

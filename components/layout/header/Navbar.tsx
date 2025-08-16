@@ -21,6 +21,7 @@ import { siteConfig } from "@/config/site";
 import { signOut, useSession } from "next-auth/react";
 import { UserWithDetails } from "@/interface";
 import { useState } from "react";
+import { isUserAdmin, isUserSubscribed } from "@/auth-guard";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,16 +55,18 @@ const Navbar = () => {
         {data?.user && status === "authenticated" ? (
           <>
             <NavbarItem className="hidden sm:flex">
-              <Button
-                className="bg-foreground font-medium text-background px-5"
-                color="secondary"
-                radius="full"
-                variant="flat"
-                as={Link}
-                href="/subscribe"
-              >
-                Subscribe for ฿99.00
-              </Button>
+              {!isUserSubscribed(user) && (
+                <Button
+                  className="bg-foreground font-medium text-background px-5"
+                  color="secondary"
+                  radius="full"
+                  variant="flat"
+                  as={Link}
+                  href="/subscribe"
+                >
+                  Subscribe for ฿99.00
+                </Button>
+              )}
             </NavbarItem>
             <NavbarItem className="hidden sm:flex">
               <HeaderUser user={user} />
@@ -114,29 +117,33 @@ const Navbar = () => {
                 description={user.email}
                 name={user.name}
               />
-              <NavbarMenuItem>
-                <Link
-                  color={"foreground"}
-                  href="/admin/dashboard"
-                  size="lg"
-                  className="flex gap-1"
-                  onPress={() => setIsMenuOpen(false)}
-                >
-                  <Icon icon="tabler:user-cog" /> Admin Dashboard
-                </Link>
-              </NavbarMenuItem>
+              {isUserAdmin(user) ? (
+                <NavbarMenuItem>
+                  <Link
+                    color={"foreground"}
+                    href="/admin/dashboard"
+                    size="lg"
+                    className="flex gap-1"
+                    onPress={() => setIsMenuOpen(false)}
+                  >
+                    <Icon icon="tabler:user-cog" /> Admin Dashboard
+                  </Link>
+                </NavbarMenuItem>
+              ) : null}
 
-              <NavbarMenuItem>
-                <Link
-                  color={"foreground"}
-                  href="/app/dashboard"
-                  size="lg"
-                  className="flex gap-1"
-                  onPress={() => setIsMenuOpen(false)}
-                >
-                  <Icon icon="hugeicons:ai-brain-04" /> App Dashboard
-                </Link>
-              </NavbarMenuItem>
+              {isUserAdmin(user) || isUserSubscribed(user) ? (
+                <NavbarMenuItem>
+                  <Link
+                    color={"foreground"}
+                    href="/app/dashboard"
+                    size="lg"
+                    className="flex gap-1"
+                    onPress={() => setIsMenuOpen(false)}
+                  >
+                    <Icon icon="hugeicons:ai-brain-04" /> App Dashboard
+                  </Link>
+                </NavbarMenuItem>
+              ) : null}
 
               <NavbarMenuItem>
                 <Link

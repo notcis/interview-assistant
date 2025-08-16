@@ -40,8 +40,9 @@ export interface Subscription {
 }
 
 export interface UserWithDetails extends User {
-  ProfilePicture: { urlId: string | null; url: string | null };
-  authProvider: { provider: ProviderName; providerId: string }[];
+  ProfilePicture: ProfilePicture | null;
+  authProvider: AuthProvider[];
+  Subscription: Subscription | null;
 }
 
 export interface InterviewBody {

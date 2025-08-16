@@ -1,12 +1,46 @@
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 
 import { Button, Input, Radio, RadioGroup } from "@heroui/react";
 import { Logo } from "@/config/logo";
 import { Icon } from "@iconify/react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { cancelSubscription } from "@/actions/payment.action";
+import toast from "react-hot-toast";
 
 const Unsubscribe = () => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const { data: session, status, update } = useSession();
+
+  const handleUnsubscribe = async () => {
+    startTransition(async () => {
+      const res = await cancelSubscription(session?.user?.email || "");
+      if (!res.success) {
+        toast.error(res.message || "Failed to unsubscribe");
+        return;
+      }
+      if (!res.subscription) {
+        toast.error("Failed to unsubscribe");
+        return;
+      }
+      const updateSession = await update({
+        Subscription: {
+          id: res.subscription.id!,
+          status: res.subscription.status,
+        },
+      });
+
+      if (updateSession) {
+        toast.success("Subscription updated successfully!");
+        router.push("/");
+      }
+    });
+  };
+
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large">
@@ -20,7 +54,7 @@ const Unsubscribe = () => {
 
         <div className="flex flex-col gap-5">
           <RadioGroup isDisabled label="Your Plan" defaultValue={"9.99"}>
-            <Radio value="9.99">$9.99 per month</Radio>
+            <Radio value="9.99">฿99.00 per month</Radio>
           </RadioGroup>
 
           <Input
@@ -28,17 +62,25 @@ const Unsubscribe = () => {
             label="Email Address"
             placeholder="Email"
             variant="bordered"
+            value={session?.user?.email || ""}
             isDisabled
           />
 
-          <Button
-            className="w-full"
-            color="danger"
-            type="submit"
-            startContent={<Icon icon="solar:card-recive-bold" fontSize={19} />}
-          >
-            UnSubscribe
-          </Button>
+          {status === "authenticated" && (
+            <Button
+              className="w-full"
+              color="danger"
+              type="submit"
+              startContent={
+                <Icon icon="solar:card-recive-bold" fontSize={19} />
+              }
+              onPress={handleUnsubscribe}
+              isLoading={isPending}
+              isDisabled={isPending}
+            >
+              UnSubscribe
+            </Button>
+          )}
         </div>
       </div>
     </div>

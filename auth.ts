@@ -21,7 +21,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       else {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
-          include: { ProfilePicture: true, authProvider: true },
+          include: {
+            ProfilePicture: true,
+            authProvider: true,
+            Subscription: true,
+          },
         });
 
         // If the user does not exist, create a new user
@@ -86,7 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Return true to indicate successful sign-in
       return true;
     },
-    async jwt({ token, user, trigger }: any) {
+    async jwt({ token, user, trigger, session }: any) {
       // If the user is signing in for the first time, we add the user ID to the token
       if (user) {
         token.user = user;
@@ -95,7 +99,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       else {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.user.id },
-          include: { ProfilePicture: true, authProvider: true },
+          include: {
+            ProfilePicture: true,
+            authProvider: true,
+            Subscription: true,
+          },
         });
 
         // If the user exists in the database, we add it to the token
@@ -107,8 +115,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (trigger === "update") {
         let updatedUser = await prisma.user.findUnique({
           where: { id: token.user.id },
-          include: { ProfilePicture: true, authProvider: true },
+          include: {
+            ProfilePicture: true,
+            authProvider: true,
+            Subscription: true,
+          },
         });
+
+        if (session.Subscription) {
+          if (updatedUser) {
+            updatedUser.Subscription = {
+              id: session.Subscription.id as string,
+              userId: updatedUser.id as string,
+              status: session.Subscription.status as string,
+              customerId: updatedUser.Subscription?.customerId ?? "",
+              created: updatedUser.Subscription?.created ?? new Date(),
+              startDate: updatedUser.Subscription?.startDate ?? new Date(),
+              currentPeriodEnd:
+                updatedUser.Subscription?.currentPeriodEnd ?? new Date(),
+              nextPaymentAttempt:
+                updatedUser.Subscription?.nextPaymentAttempt ?? null,
+            };
+          }
+        }
+
         token.user = updatedUser;
       }
 
@@ -136,7 +166,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Check if the user exists in the database
         const user = await prisma.user.findUnique({
           where: { email: credentials?.email as string },
-          include: { ProfilePicture: true, authProvider: true },
+          include: {
+            ProfilePicture: true,
+            authProvider: true,
+            Subscription: true,
+          },
         });
 
         // If the user does not exist or the password is incorrect, return null
