@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import stripe from "@/utils/Stripe";
 
@@ -112,8 +113,36 @@ export const cancelSubscription = async (email: string) => {
     };
   }
 
+  await prisma.subscription.update({
+    where: { id: user.Subscription.id },
+    data: { status: "canceled", nextPaymentAttempt: null },
+  });
+
   return {
     success: true,
     subscription,
+  };
+};
+
+export const getInvoices = async () => {
+  const session = await auth();
+  if (!session?.user.Subscription.id || !session.user.Subscription.customerId) {
+    return {
+      invoices: [],
+    };
+  }
+
+  const invoices = await stripe.invoices.list({
+    customer: session.user.Subscription.customerId,
+  });
+
+  if (!invoices || invoices.data.length === 0) {
+    return {
+      invoices: [],
+    };
+  }
+
+  return {
+    invoices: invoices.data,
   };
 };

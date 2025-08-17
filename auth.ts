@@ -122,7 +122,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
 
-        if (session.Subscription) {
+        /*   if (session.Subscription) {
           if (updatedUser) {
             updatedUser.Subscription = {
               id: session.Subscription.id as string,
@@ -137,7 +137,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 updatedUser.Subscription?.nextPaymentAttempt ?? null,
             };
           }
-        }
+        } */
 
         token.user = updatedUser;
       }

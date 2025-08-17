@@ -4,7 +4,15 @@ import React from "react";
 import { Card, Chip, cn } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
-export default function DashboardStats() {
+export default function DashboardStats({
+  totalInterviews,
+  completionRate,
+  subscriptionStatus,
+}: {
+  totalInterviews: number;
+  completionRate: string;
+  subscriptionStatus: string;
+}) {
   const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
@@ -12,25 +20,25 @@ export default function DashboardStats() {
   const data = [
     {
       title: "Total Interviews",
-      value: 0,
+      value: totalInterviews || 0,
       bgColor: "bg-primary-50",
       iconColor: "text-primary",
       iconName: "solar:users-group-rounded-linear",
     },
     {
       title: "Completion Rate",
-      value: "0%",
+      value: completionRate ? `${completionRate}%` : "0.00",
       bgColor: "bg-warning-50",
       iconColor: "text-warning",
       iconName: "solar:users-group-two-rounded-bold",
     },
     {
       title: "Subscription",
-      value: "Active",
+      value: capitalizeFirstLetter(subscriptionStatus),
       bgColor: "bg-success-50",
       iconColor: "text-success",
       iconName: "solar:dollar-minimalistic-broken",
-      change: "$9.99",
+      change: "฿99.00",
     },
   ];
   return (

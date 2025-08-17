@@ -12,7 +12,9 @@
   "dependencies": {
     "@heroui/react": "^2.8.2",
     "@iconify/react": "^6.0.0",
+    "@internationalized/date": "^3.8.2",
     "@prisma/client": "^6.13.0",
+    "@react-aria/i18n": "^3.12.11",
     "@stripe/react-stripe-js": "^3.9.0",
     "@stripe/stripe-js": "^7.8.0",
     "bcryptjs": "^3.0.2",

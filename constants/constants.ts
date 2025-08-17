@@ -85,4 +85,4 @@ export const testimonials = [
 
 // Constants for pagination
 export const QUESTIONS_PER_PAGE = 5;
-export const LIST_PER_PAGE = 2;
+export const LIST_PER_PAGE = 5;

@@ -3,9 +3,11 @@
 import { Prisma } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { LIST_PER_PAGE } from "@/constants/constants";
+import { getFirstDayOfMonth, getToday } from "@/helpers";
 import { InterviewBody } from "@/interface";
 import { prisma } from "@/lib/prisma";
 import { evaluateAnswer, generateQuestions } from "@/openai/openai";
+import { console } from "inspector";
 import { revalidatePath } from "next/cache";
 
 // Create Interview
@@ -352,4 +354,118 @@ export const updateInterview = async (
       message: "Failed to update interview",
     };
   }
+};
+
+export const getInterviewStats = async ({
+  startDate,
+  endDate,
+}: {
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const session = await auth();
+  const start = new Date(startDate || getFirstDayOfMonth());
+  const end = new Date(endDate || getToday());
+
+  // รวมจำนวนสัมภาษณ์ทั้งหมด
+  const totalAgg = await prisma.interview.aggregate({
+    where: {
+      userId: session?.user?.id,
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+    _count: { id: true },
+  });
+
+  // รวมจำนวนสัมภาษณ์ทั้งหมด
+  const totalInterviews = totalAgg._count.id;
+
+  // ดึงสัมภาษณ์แต่ละวัน
+  const interviews = await prisma.interview.findMany({
+    where: {
+      userId: session?.user?.id,
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+    include: {
+      Question: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  // สร้างสถิติรายวัน
+  const statsMap: Record<
+    string,
+    {
+      totalInterviews: number;
+      completedQuestions: number;
+      unansweredQuestions: number;
+    }
+  > = {};
+
+  // สร้างสถิติรายวัน
+  interviews.forEach((interview) => {
+    const date = interview.createdAt.toISOString().slice(0, 10);
+    if (!statsMap[date]) {
+      statsMap[date] = {
+        totalInterviews: 0,
+        completedQuestions: 0,
+        unansweredQuestions: 0,
+      };
+    }
+    statsMap[date].totalInterviews += 1;
+    statsMap[date].completedQuestions += interview.Question.filter(
+      (q) => q.completed
+    ).length;
+    statsMap[date].unansweredQuestions += interview.Question.filter(
+      (q) => !q.completed
+    ).length;
+  });
+
+  // สร้างสถิติรายวัน
+  const stats = Object.entries(statsMap).map(([date, value]) => ({
+    date,
+    totalInterviews: value.totalInterviews,
+    completedQuestions: value.completedQuestions,
+    unansweredQuestions: value.unansweredQuestions,
+    completionRate:
+      value.completedQuestions + value.unansweredQuestions > 0
+        ? Math.round(
+            (value.completedQuestions /
+              (value.completedQuestions + value.unansweredQuestions)) *
+              100
+          )
+        : 0,
+  }));
+
+  // คำนวณ completionRate รวม
+  const totalCompleted = interviews.reduce(
+    (sum, interview) =>
+      sum + interview.Question.filter((q) => q.completed).length,
+    0
+  );
+  // รวมจำนวนคำถามทั้งหมด
+  const totalQuestions = interviews.reduce(
+    (sum, interview) => sum + interview.Question.length,
+    0
+  );
+  // คำนวณอัตราการทำแบบสอบถาม
+  const completionRate =
+    totalQuestions > 0
+      ? ((totalCompleted / totalQuestions) * 100).toFixed(2).toString()
+      : "0.00";
+
+  return {
+    data: {
+      totalInterviews,
+      completionRate,
+      stats,
+    },
+  };
 };
