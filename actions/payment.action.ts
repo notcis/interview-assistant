@@ -126,7 +126,7 @@ export const cancelSubscription = async (email: string) => {
 
 export const getInvoices = async () => {
   const session = await auth();
-  if (!session?.user.Subscription.id || !session.user.Subscription.customerId) {
+  if (!session?.user?.Subscription?.id) {
     return {
       invoices: [],
     };

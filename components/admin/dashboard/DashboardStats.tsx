@@ -5,11 +5,22 @@ import { Button, Card, cn } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 
-export default function DashboardStats() {
+export default function DashboardStats({
+  data,
+}: {
+  data: {
+    totalUsers: number;
+    activeSubscriptions: number;
+    subscriptionsWorth: number;
+    totalInterview: number;
+    interviewCompletionRate: number;
+    averageInterviewPerUser: number;
+  };
+}) {
   const stats = [
     {
       title: "Total Users",
-      value: 3,
+      value: data.totalUsers,
       bgColor: "bg-primary-50",
       iconColor: "text-primary",
       iconName: "solar:users-group-rounded-linear",
@@ -17,15 +28,15 @@ export default function DashboardStats() {
     },
     {
       title: "Active Subs",
-      value: 3,
+      value: data.activeSubscriptions,
       bgColor: "bg-warning-50",
       iconColor: "text-warning",
       iconName: "solar:users-group-two-rounded-bold",
       link: "/admin/users?subscription.status=active",
     },
     {
-      title: "Active Subs ($)",
-      value: `$34`,
+      title: "Active Subs (฿)",
+      value: `฿${data.subscriptionsWorth}`,
       bgColor: "bg-success-50",
       iconColor: "text-success",
       iconName: "solar:dollar-minimalistic-broken",
@@ -33,7 +44,7 @@ export default function DashboardStats() {
     },
     {
       title: "Total Interviews",
-      value: 34,
+      value: data.totalInterview,
       bgColor: "bg-danger-50",
       iconColor: "text-danger",
       iconName: "solar:user-speak-bold",
@@ -41,7 +52,7 @@ export default function DashboardStats() {
     },
     {
       title: "Completion Rate",
-      value: `34%`,
+      value: `${data.interviewCompletionRate}%`,
       bgColor: "bg-secondary-50",
       iconColor: "text-secondary",
       iconName: "tabler:percentage",
@@ -49,7 +60,7 @@ export default function DashboardStats() {
     },
     {
       title: "Interviews / user",
-      value: 4,
+      value: data.averageInterviewPerUser,
       bgColor: "bg-default-50",
       iconColor: "text-default",
       iconName: "tabler:user-hexagon",

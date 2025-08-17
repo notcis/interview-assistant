@@ -86,3 +86,4 @@ export const testimonials = [
 // Constants for pagination
 export const QUESTIONS_PER_PAGE = 5;
 export const LIST_PER_PAGE = 5;
+export const SUBSCRIPTION_PACKAGE_PRICE = 99.0;

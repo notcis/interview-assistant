@@ -2,8 +2,20 @@
 
 import React from "react";
 import DashboardStats from ".//DashboardStats";
+import StatsDatePicker from "@/components/date-picker/StatsDatePicker";
 
-const Dashboard = () => {
+const Dashboard = ({
+  data,
+}: {
+  data: {
+    totalUsers: number;
+    activeSubscriptions: number;
+    subscriptionsWorth: number;
+    totalInterview: number;
+    interviewCompletionRate: number;
+    averageInterviewPerUser: number;
+  };
+}) => {
   return (
     <div>
       <div className="flex justify-between items-center my-16">
@@ -12,9 +24,10 @@ const Dashboard = () => {
         </h1>
 
         {/* Date Picker */}
+        <StatsDatePicker />
       </div>
 
-      <DashboardStats />
+      <DashboardStats data={data} />
     </div>
   );
 };

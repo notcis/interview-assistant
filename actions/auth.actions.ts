@@ -16,7 +16,9 @@ import {
 import { resetPasswordHTMLTemplate } from "@/utils/emailTemplate";
 import sendEmail from "@/utils/sendEmail";
 import crypto from "crypto";
-import { getResetPasswordToken } from "@/helpers";
+import { getFirstDayOfMonth, getResetPasswordToken, getToday } from "@/helpers";
+import { console } from "inspector";
+import { SUBSCRIPTION_PACKAGE_PRICE } from "@/constants/constants";
 
 export const registerUser = async (
   name: string,
@@ -332,4 +334,78 @@ export const resetUserPassword = async (
       message: formatError(error),
     };
   }
+};
+
+export const getDashboardStats = async ({
+  startDate,
+  endDate,
+}: {
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const start = new Date(startDate || getFirstDayOfMonth());
+  const end = new Date(endDate || getToday());
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
+  const totalUsers = await prisma.user.count({
+    where: {
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+
+  const activeSubscriptions = await prisma.subscription.count({
+    where: {
+      created: {
+        gte: start,
+        lte: end,
+      },
+      status: "active",
+    },
+  });
+
+  const totalSubscriptionsWorth =
+    activeSubscriptions * SUBSCRIPTION_PACKAGE_PRICE;
+
+  const totalInterview = await prisma.interview.count({
+    where: {
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+
+  const completedInterviews = await prisma.interview.count({
+    where: {
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+      status: "completed",
+    },
+  });
+
+  const interviewCompletionRate =
+    totalInterview > 0
+      ? parseFloat(((completedInterviews / totalInterview) * 100).toFixed(2))
+      : 0;
+
+  const averageInterviewPerUser =
+    totalInterview > 0
+      ? parseFloat((totalInterview / totalUsers).toFixed(2))
+      : 0;
+
+  return {
+    totalUsers,
+    activeSubscriptions,
+    subscriptionsWorth: totalSubscriptionsWorth,
+    totalInterview,
+    interviewCompletionRate,
+    averageInterviewPerUser,
+  };
 };

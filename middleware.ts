@@ -12,9 +12,14 @@ export default async function middleware(request: NextRequest) {
 
   // Define protected paths
   const protectedPaths = ["/app/"];
+  const protectedAdminPaths = ["/admin/"];
 
   // Check if the request path is one of the protected paths
   const isProtectedPath = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
+
+  const isProtectedAdminPath = protectedAdminPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
@@ -23,6 +28,11 @@ export default async function middleware(request: NextRequest) {
 
   // If the path is protected and no token is found, redirect to login
   if (isProtectedPath && !IsSubscribed && !IsAdmin) {
+    const url = new URL("/", request.url);
+    return NextResponse.redirect(url);
+  }
+
+  if (isProtectedAdminPath && !IsAdmin) {
     const url = new URL("/", request.url);
     return NextResponse.redirect(url);
   }
