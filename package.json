@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "install": "npm install --legacy-peer-deps",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -33,7 +32,7 @@
     "react-is": "^19.1.1",
     "recharts": "^3.1.0",
     "stripe": "^18.4.0",
-    "zod": "^4.0.15"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@prisma/extension-accelerate": "^2.0.2",
