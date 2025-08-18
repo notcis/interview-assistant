@@ -14,7 +14,6 @@ import {
   SelectItem,
 } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-
 import { Key } from "@react-types/shared";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -25,6 +24,10 @@ import {
   Subscription,
 } from "@/app/generated/prisma";
 import CustomPagination from "@/components/layout/pagination/CustomPagination";
+import UpdateUser from "./UpdateUser";
+import { cancelSubscription } from "@/actions/payment.action";
+import { isUserSubscribed } from "@/auth-guard";
+import { deleteUserData } from "@/actions/auth.actions";
 
 export const columns = [
   { name: "USER", uid: "user" },
@@ -48,15 +51,28 @@ export default function ListUsers({
 }) {
   const router = useRouter();
 
-  /*   const deleteInterviewHandle = async (interviewId: string) => {
-    const res = await deleteUserInterview(interviewId);
+  const handleUnsubscribe = async (email: string) => {
+    const res = await cancelSubscription(email);
+    if (!res.success) {
+      toast.error(res.message || "Failed to unsubscribe");
+      return;
+    }
+    if (!res.subscription) {
+      toast.error("Failed to unsubscribe");
+      return;
+    }
+    toast.success("Subscription updated successfully!");
+  };
+
+  const deleteUserHandle = async (userId: string) => {
+    const res = await deleteUserData(userId);
     if (!res.success) {
       toast.error(res.message);
       return;
     }
 
     toast.success(res.message);
-  }; */
+  };
 
   const renderCell = React.useCallback(
     (user: UserWithRelations, columnKey: Key) => {
@@ -98,25 +114,26 @@ export default function ListUsers({
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
-              <Tooltip color="danger" content="Cancel Subscription">
-                <span className="text-lg text-warning cursor-pointer active:opacity-50">
-                  <Icon
-                    icon="solar:shield-cross-bold"
-                    fontSize={22}
-                    onClick={
-                      () => {}
-                      /* router.push(`/app/interviews/conduct/${interview.id}`) */
-                    }
-                  />
-                </span>
-              </Tooltip>
+              <UpdateUser user={user} />
+
+              {isUserSubscribed(user as any) && (
+                <Tooltip color="danger" content="Cancel Subscription">
+                  <span className="text-lg text-warning cursor-pointer active:opacity-50">
+                    <Icon
+                      icon="solar:shield-cross-bold"
+                      fontSize={22}
+                      onClick={() => handleUnsubscribe(user.email || "")}
+                    />
+                  </span>
+                </Tooltip>
+              )}
 
               <Tooltip color="danger" content="Delete User">
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
                   <Icon
                     icon="solar:trash-bin-trash-outline"
                     fontSize={21}
-                    /*  onClick={() => deleteInterviewHandle(interview.id)} */
+                    onClick={() => deleteUserHandle(user.id)}
                   />
                 </span>
               </Tooltip>

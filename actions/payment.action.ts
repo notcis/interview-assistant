@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import stripe from "@/utils/Stripe";
+import { revalidatePath } from "next/cache";
 
 export const createNewSubscription = async (
   email: string,
@@ -117,6 +118,8 @@ export const cancelSubscription = async (email: string) => {
     where: { id: user.Subscription.id },
     data: { status: "canceled", nextPaymentAttempt: null },
   });
+
+  revalidatePath("/admin/users");
 
   return {
     success: true,

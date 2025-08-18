@@ -23,6 +23,7 @@ import {
   SUBSCRIPTION_PACKAGE_PRICE,
 } from "@/constants/constants";
 import { Prisma } from "@/app/generated/prisma";
+import { revalidatePath } from "next/cache";
 
 export const registerUser = async (
   name: string,
@@ -459,4 +460,89 @@ export const getAllUsers = async ({
       totalPages: Math.ceil(total / LIST_PER_PAGE),
     },
   };
+};
+
+export const updateUserData = async ({
+  userId,
+  userData,
+}: {
+  userId: string;
+  userData: {
+    name: string;
+    roles: string;
+  };
+}) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    // Update the user's data
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: userData.name,
+        role: userData.roles,
+      },
+    });
+
+    revalidatePath(`/admin/users`);
+
+    return {
+      success: true,
+      message: "User data updated successfully",
+    };
+  } catch (error) {
+    console.error("Error in update user data action:", error);
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+};
+
+export const deleteUserData = async (userId: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        ProfilePicture: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    if (user.ProfilePicture?.id) {
+      await delete_file(user.ProfilePicture.id);
+    }
+    // Update the user's data
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    revalidatePath(`/admin/users`);
+
+    return {
+      success: true,
+      message: "User deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error in delete user data action:", error);
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 };
