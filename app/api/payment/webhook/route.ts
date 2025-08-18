@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+/* import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import stripe from "@/utils/Stripe";
 
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   switch (event.type) {
     case "invoice.payment_succeeded":
-      /*      const invoice = event.data.object;
+      const invoice = event.data.object;
       const email = invoice.customer_email;
       const customer = await stripe.customers.retrieve(
         invoice.customer as string
@@ -58,11 +58,11 @@ export async function POST(req: Request) {
           startDate: new Date(invoice.lines.data[0].period.start * 1000),
           currentPeriodEnd: new Date(invoice.lines.data[0].period.end * 1000),
         },
-      }); */
+      });
 
       break;
     case "invoice.payment_failed":
-      /*     const paymentFailed = event.data.object;
+      const paymentFailed = event.data.object;
 
       const nextpaymentAttempt = paymentFailed.next_payment_attempt;
       await prisma.subscription.update({
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
             ? new Date(nextpaymentAttempt * 1000)
             : null,
         },
-      }); */
+      });
       break;
     case "customer.subscription.deleted":
       const subscriptionDelete = event.data.object;
@@ -89,3 +89,4 @@ export async function POST(req: Request) {
 
   return new Response("Webhook received", { status: 200 });
 }
+ */
