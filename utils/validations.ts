@@ -2,7 +2,7 @@ import z from "zod";
 
 export const RegisterUserSchema = z.object({
   name: z.string().min(2).max(100),
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(6).max(100),
 });
 
@@ -26,7 +26,7 @@ export const UpdatePasswordSchema = z
   });
 
 export const ForgotUserPasswordSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
 });
 
 export const ResetUserPasswordSchema = z
