@@ -5,6 +5,7 @@ export enum ProviderName {
 }
 
 export interface User {
+  authProvider: any;
   id: string;
   name: string;
   email: string;

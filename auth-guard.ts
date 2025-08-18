@@ -10,3 +10,7 @@ export const isUserSubscribed = (user: UserWithDetails) => {
 export const isUserAdmin = (user: UserWithDetails) => {
   return user?.role?.includes("admin");
 };
+
+export const isAdminPath = (pathname: string) => {
+  return pathname.includes("/admin");
+};

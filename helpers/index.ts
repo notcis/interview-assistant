@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { pageIcons } from "@/constants/page";
-import { Question } from "@/interface";
+import { Question, Result } from "@/app/generated/prisma";
+
+type QuestionWithRelation = Question & {
+  result: Result | null;
+};
 
 // Get the icon and color for a specific page
 export function getPageIconAndPath(pathname: string): {
@@ -103,7 +107,7 @@ export const getAnswersFromLocalStorage = (interviewId: string) => {
   return storedAnswers ? JSON.parse(storedAnswers) : null;
 };
 
-export const calculateAverageScore = (questions: Question[]) => {
+export const calculateAverageScore = (questions: QuestionWithRelation[]) => {
   if (!questions || questions.length === 0) return 0;
 
   const totalScore = questions.reduce((acc, question) => {

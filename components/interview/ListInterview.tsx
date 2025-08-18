@@ -20,9 +20,10 @@ import { Key } from "@react-types/shared";
 import { deleteUserInterview } from "@/actions/interview.action";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { calculateAverageScore } from "@/helpers";
 import CustomPagination from "../layout/pagination/CustomPagination";
+import { isAdminPath } from "@/auth-guard";
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
@@ -41,6 +42,7 @@ export default function ListInterviews({
   totalPages,
 }: ListInterviewsProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const deleteInterviewHandle = async (interviewId: string) => {
     const res = await deleteUserInterview(interviewId);
@@ -48,6 +50,7 @@ export default function ListInterviews({
       toast.error(res.message);
       return;
     }
+
     toast.success(res.message);
   };
 
@@ -91,7 +94,9 @@ export default function ListInterviews({
         case "actions":
           return (
             <>
-              {interview.answered === 0 && interview.status !== "completed" ? (
+              {interview.answered === 0 &&
+              interview.status !== "completed" &&
+              !isAdminPath(pathname) ? (
                 <Button
                   className="bg-foreground font-medium text-background"
                   color="secondary"
@@ -106,16 +111,31 @@ export default function ListInterviews({
                 </Button>
               ) : (
                 <div className="relative flex justify-center items-center gap-2">
-                  {interview.status !== "completed" && (
-                    <Tooltip color="danger" content="Continue Interview">
-                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                  {interview.status !== "completed" &&
+                    !isAdminPath(pathname) && (
+                      <Tooltip color="danger" content="Continue Interview">
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                          <Icon
+                            icon="solar:round-double-alt-arrow-right-bold"
+                            fontSize={22}
+                            onClick={() =>
+                              router.push(
+                                `/app/interviews/conduct/${interview.id}`
+                              )
+                            }
+                          />
+                        </span>
+                      </Tooltip>
+                    )}
+
+                  {interview.status === "completed" && (
+                    <Tooltip content="View Result">
+                      <span className="text-lg text-defaul-400 cursor-pointer active:opacity-50">
                         <Icon
-                          icon="solar:round-double-alt-arrow-right-bold"
+                          icon="solar:eye-broken"
                           fontSize={22}
                           onClick={() =>
-                            router.push(
-                              `/app/interviews/conduct/${interview.id}`
-                            )
+                            router.push(`/app/results/${interview.id}`)
                           }
                         />
                       </span>
@@ -135,7 +155,7 @@ export default function ListInterviews({
             </>
           );
         default:
-          cellValue;
+          return cellValue;
       }
     },
     []
@@ -186,7 +206,9 @@ export default function ListInterviews({
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell>
+                  {renderCell(item, columnKey) as React.ReactNode}
+                </TableCell>
               )}
             </TableRow>
           )}

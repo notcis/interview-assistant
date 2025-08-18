@@ -101,9 +101,11 @@ export const createInterview = async (body: InterviewBody) => {
 export const getInterviews = async ({
   filter,
   page = 1,
+  admin,
 }: {
   filter: { status?: string };
   page?: number;
+  admin?: string;
 }) => {
   // ตรวจสอบการเข้าสู่ระบบ
   const session = await auth();
@@ -116,6 +118,11 @@ export const getInterviews = async ({
     ? { status: filter.status }
     : {};
 
+  let filterUser: Prisma.InterviewWhereInput = {};
+  if (!admin) {
+    filterUser = { userId: session.user.id };
+  }
+
   const skip = (page - 1) * LIST_PER_PAGE;
   const take = LIST_PER_PAGE;
 
@@ -123,7 +130,7 @@ export const getInterviews = async ({
   const [interviews, total] = await Promise.all([
     prisma.interview.findMany({
       where: {
-        userId: session.user.id,
+        ...filterUser,
         ...filterStatus,
       },
       orderBy: {
@@ -141,7 +148,7 @@ export const getInterviews = async ({
     }),
     prisma.interview.count({
       where: {
-        userId: session.user.id,
+        ...filterUser,
         ...filterStatus,
       },
     }),
@@ -175,6 +182,7 @@ export const deleteUserInterview = async (interviewId: string) => {
     });
 
     revalidatePath("/app/interviews");
+    revalidatePath("/admin/interviews");
 
     return {
       success: true,

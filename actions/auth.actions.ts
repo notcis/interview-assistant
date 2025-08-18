@@ -18,7 +18,11 @@ import sendEmail from "@/utils/sendEmail";
 import crypto from "crypto";
 import { getFirstDayOfMonth, getResetPasswordToken, getToday } from "@/helpers";
 import { console } from "inspector";
-import { SUBSCRIPTION_PACKAGE_PRICE } from "@/constants/constants";
+import {
+  LIST_PER_PAGE,
+  SUBSCRIPTION_PACKAGE_PRICE,
+} from "@/constants/constants";
+import { Prisma } from "@/app/generated/prisma";
 
 export const registerUser = async (
   name: string,
@@ -407,5 +411,52 @@ export const getDashboardStats = async ({
     totalInterview,
     interviewCompletionRate,
     averageInterviewPerUser,
+  };
+};
+
+export const getAllUsers = async ({
+  filter,
+  page = 1,
+}: {
+  filter: { subscription?: string };
+  page?: number;
+}) => {
+  const filterSubscription: Prisma.UserWhereInput = filter?.subscription
+    ? { Subscription: { status: filter.subscription } }
+    : {};
+
+  const skip = (page - 1) * LIST_PER_PAGE;
+  const take = LIST_PER_PAGE;
+
+  // ค้นหาผู้ใช้แบบมี pagination
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        ...filterSubscription,
+      },
+      include: {
+        ProfilePicture: true,
+        authProvider: true,
+        Subscription: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take,
+    }),
+    prisma.user.count({
+      where: {
+        ...filterSubscription,
+      },
+    }),
+  ]);
+
+  return {
+    users,
+    pagination: {
+      page,
+      totalPages: Math.ceil(total / LIST_PER_PAGE),
+    },
   };
 };
