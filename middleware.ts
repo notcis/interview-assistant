@@ -4,44 +4,34 @@ import { getToken } from "next-auth/jwt";
 import { isUserAdmin, isUserSubscribed } from "./auth-guard";
 
 export default async function middleware(request: NextRequest) {
-  // Check if the request has a valid token
+  // อ่านจาก env ที่ถูกฝังตอน build (ไม่ต้องส่ง secret)
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
   });
 
-  // Define protected paths
-  const protectedPaths = ["/app/"];
-  const protectedAdminPaths = ["/admin/"];
+  const pathname = request.nextUrl.pathname;
 
-  // Check if the request path is one of the protected paths
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  // ใช้ path แบบไม่ต้องลงท้ายด้วย / เพื่อครอบคลุมทั้ง /app และ /app/xxx
+  const isProtectedPath = pathname.startsWith("/app");
+  const isProtectedAdminPath = pathname.startsWith("/admin");
 
-  const isProtectedAdminPath = protectedAdminPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const user = (token?.user ?? null) as any;
+  const IsSubscribed = isUserSubscribed(user);
+  const IsAdmin = isUserAdmin(user);
 
-  const IsSubscribed = isUserSubscribed(token?.user as any);
-  const IsAdmin = isUserAdmin(token?.user as any);
-
-  // If the path is protected and no token is found, redirect to login
-  if (isProtectedPath && !IsSubscribed && !IsAdmin) {
-    const url = new URL("/", request.url);
-    return NextResponse.redirect(url);
+  // ไม่มี token/สิทธิ์ → เด้งกลับหน้าแรก
+  if (isProtectedPath && !(IsSubscribed || IsAdmin)) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
-
   if (isProtectedAdminPath && !IsAdmin) {
-    const url = new URL("/", request.url);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // If the path is protected and a token is found, allow the request to proceed
   return NextResponse.next();
 }
 
-// Export the config to specify which paths this middleware applies to
+// แคบ matcher ให้เหลือเฉพาะที่ต้องเช็คจริงๆ (ช่วยดีบักคุกกี้/โฮสต์)
 export const config = {
-  matcher: ["/((?!_next|favicon.ico|api|static).*)"],
+  matcher: ["/app/:path*", "/admin/:path*"],
 };
