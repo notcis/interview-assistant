@@ -6,12 +6,12 @@ import { auth } from "./auth";
 
 export default async function middleware(request: NextRequest) {
   // อ่านจาก env ที่ถูกฝังตอน build (ไม่ต้องส่ง secret)
-  const token = await getToken({
+  /*   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
-  });
+  }); */
 
-  //const session = await auth();
+  const session = await auth();
 
   const pathname = request.nextUrl.pathname;
 
@@ -19,10 +19,9 @@ export default async function middleware(request: NextRequest) {
   const isProtectedPath = pathname.startsWith("/app");
   const isProtectedAdminPath = pathname.startsWith("/admin");
 
-  console.log(token);
-
-  const IsSubscribed = isUserSubscribed(token);
-  const IsAdmin = isUserAdmin(token);
+  const user = (session?.user ?? null) as any;
+  const IsSubscribed = isUserSubscribed(user);
+  const IsAdmin = isUserAdmin(user);
 
   // ไม่มี token/สิทธิ์ → เด้งกลับหน้าแรก
   if (isProtectedPath && !(IsSubscribed || IsAdmin)) {

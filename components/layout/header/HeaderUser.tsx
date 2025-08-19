@@ -11,7 +11,9 @@ import { UserWithDetails } from "@/interface";
 import { signOut } from "next-auth/react";
 import { isUserAdmin, isUserSubscribed } from "@/auth-guard";
 
-const HeaderUser = ({ user }: { user: UserWithDetails }) => {
+const HeaderUser = ({ user }: { user: any }) => {
+  console.log(user);
+
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
@@ -20,7 +22,7 @@ const HeaderUser = ({ user }: { user: UserWithDetails }) => {
             as="button"
             avatarProps={{
               isBordered: true,
-              src: user.ProfilePicture?.url || "/images/default_user.png",
+              src: user.profilepicture || "/images/default_user.png",
             }}
             className="transition-transform"
             description={user.email}

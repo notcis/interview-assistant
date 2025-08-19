@@ -2,7 +2,11 @@ import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   export interface Session {
-    user: UserWithDetails & DefaultSession["user"];
+    user: {
+      role: string;
+      subscribed: string;
+      profilepicture: string;
+    } & DefaultSession["user"];
   }
 }
 

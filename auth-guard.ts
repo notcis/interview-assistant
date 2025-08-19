@@ -1,14 +1,11 @@
 import { UserWithDetails } from "./interface";
 
-export const isUserSubscribed = (user: UserWithDetails) => {
-  return (
-    user?.Subscription?.status === "active" ||
-    user?.Subscription?.status === "past_due"
-  );
+export const isUserSubscribed = (user: any) => {
+  return user?.subscribed === "active" || user?.subscribed === "past_due";
 };
 
-export const isUserAdmin = (user: UserWithDetails) => {
-  return user?.role?.includes("admin");
+export const isUserAdmin = (user: any) => {
+  return user?.role === "admin";
 };
 
 export const isAdminPath = (pathname: string) => {

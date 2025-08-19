@@ -27,9 +27,9 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { data, status } = useSession();
+  const { data: session, status } = useSession();
 
-  const user = data?.user as UserWithDetails;
+  console.log("session", session);
 
   return (
     <HeroUINavbar
@@ -55,10 +55,10 @@ const Navbar = () => {
           <ThemeSwitcher />
         </NavbarItem>
 
-        {data?.user && status === "authenticated" ? (
+        {session?.user.id && status === "authenticated" ? (
           <>
             <NavbarItem className="hidden sm:flex">
-              {!isUserSubscribed(user) && (
+              {!isUserSubscribed(session.user) && (
                 <Button
                   className="bg-foreground font-medium text-background px-5"
                   color="secondary"
@@ -72,7 +72,7 @@ const Navbar = () => {
               )}
             </NavbarItem>
             <NavbarItem className="hidden sm:flex">
-              <HeaderUser user={user} />
+              <HeaderUser user={session.user} />
             </NavbarItem>
           </>
         ) : (
@@ -107,7 +107,7 @@ const Navbar = () => {
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitcher />
-        {data?.user && status === "authenticated" ? (
+        {session?.user && status === "authenticated" ? (
           <>
             <NavbarMenuToggle aria-label="Open menu" />
             <NavbarMenu className="pt-16">
@@ -115,13 +115,14 @@ const Navbar = () => {
                 as="button"
                 avatarProps={{
                   isBordered: true,
-                  src: user.ProfilePicture?.url || "/images/default_user.png",
+                  src:
+                    session.user.profilepicture || "/images/default_user.png",
                 }}
                 className="transition-transform"
-                description={user.email}
-                name={user.name}
+                description={session.user.email}
+                name={session.user.name}
               />
-              {isUserAdmin(user) ? (
+              {isUserAdmin(session.user) ? (
                 <NavbarMenuItem>
                   <Link
                     color={"foreground"}
@@ -135,7 +136,7 @@ const Navbar = () => {
                 </NavbarMenuItem>
               ) : null}
 
-              {isUserAdmin(user) || isUserSubscribed(user) ? (
+              {isUserAdmin(session.user) || isUserSubscribed(session.user) ? (
                 <NavbarMenuItem>
                   <Link
                     color={"foreground"}

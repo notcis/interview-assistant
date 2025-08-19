@@ -93,12 +93,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, trigger, session }: any) {
       // If the user is signing in for the first time, we add the user ID to the token
       if (user) {
-        token.user = user;
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
+        token.subscribed = user.subscribed;
+        token.profilepicture = user.profilepicture;
       }
       // If the user is already signed in, we fetch the user from the database
       else {
         const dbUser = await prisma.user.findUnique({
-          where: { id: token.user.id },
+          where: { id: token.id },
           include: {
             ProfilePicture: true,
             authProvider: true,
@@ -108,7 +113,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         // If the user exists in the database, we add it to the token
         if (dbUser) {
-          token.user = dbUser;
+          token.id = dbUser.id;
+          token.email = dbUser.email;
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+          token.subscribed = dbUser.Subscription?.status;
+          token.profilepicture = dbUser.ProfilePicture?.url;
         }
       }
 
@@ -139,21 +149,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         } */
 
-        token.user = updatedUser;
+        token.id = updatedUser?.id;
+        token.email = updatedUser?.email;
+        token.name = updatedUser?.name;
+        token.role = updatedUser?.role;
+        token.subscribed = updatedUser?.Subscription?.status;
+        token.profilepicture = updatedUser?.ProfilePicture?.url;
       }
 
       return token;
     },
     async session({ session, token }: any) {
       // If the token has a user, we add it to the session
-      session.user = token.user;
+      session.id = token.id;
+      session.email = token.email;
+      session.name = token.name;
+      session.role = token.role;
+      session.subscribed = token.subscribed;
+      session.profilepicture = token.profilepicture;
 
       // Remove sensitive information from the session
-      delete session.user.password;
+      // delete session.user.password;
 
       return session;
     },
+    /*     async authorized({ request, auth }: any) {
+      const protectedPaths = [/\/app\/(.*)/, /\/admin\/(.*)/];
+
+      const { pathname } = request.nextUrl;
+
+      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+    }, */
   },
+
   providers: [
     GitHub,
     Google,
@@ -186,7 +214,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isValid) return null;
 
         // If the user exists and the password is correct, return the user object
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          subscribed: user.Subscription?.status,
+          profilepicture: user.ProfilePicture?.url,
+        };
       },
     }),
   ],
