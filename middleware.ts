@@ -17,11 +17,8 @@ export default async function middleware(request: NextRequest) {
   const isProtectedAdminPath = pathname.startsWith("/admin");
 
   const user = (token?.user ?? null) as any;
-  /*   const IsSubscribed = isUserSubscribed(user);
+  const IsSubscribed = isUserSubscribed(user);
   const IsAdmin = isUserAdmin(user);
- */
-  const IsSubscribed = true; // แทนที่ด้วย true เพื่อให้ผ่านการตรวจสอบ
-  const IsAdmin = true; // แทนที่ด้วย true เพื่อให้ผ่านการตรวจสอบ
 
   // ไม่มี token/สิทธิ์ → เด้งกลับหน้าแรก
   if (isProtectedPath && !(IsSubscribed || IsAdmin)) {
