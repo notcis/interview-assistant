@@ -19,10 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: siteConfig.name || "Assistant Chat",
-  description:
-    siteConfig.description ||
-    "A Next.js application that provides an AI-powered chat assistant.",
+  title: siteConfig.name || "Interview Assistant",
+  description: siteConfig.description || "An AI-powered interview assistant.",
 };
 
 export default function RootLayout({
