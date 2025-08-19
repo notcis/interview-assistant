@@ -24,7 +24,7 @@ type DashboardProps = {
 const Dashboard = ({ data }: DashboardProps) => {
   const { data: session, status } = useSession();
 
-  const user = session?.user as UserWithDetails;
+  const user = session?.user;
 
   return (
     <div className="mt-5">
@@ -32,7 +32,7 @@ const Dashboard = ({ data }: DashboardProps) => {
         <DashboardStats
           totalInterviews={data.totalInterviews}
           completionRate={data.completionRate}
-          subscriptionStatus={user?.Subscription?.status || "No Subscription"}
+          subscriptionStatus={user?.subscribed || "No Subscription"}
         />
       )}
 

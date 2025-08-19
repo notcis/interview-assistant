@@ -12,8 +12,6 @@ import { signOut } from "next-auth/react";
 import { isUserAdmin, isUserSubscribed } from "@/auth-guard";
 
 const HeaderUser = ({ user }: { user: any }) => {
-  console.log(user);
-
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
