@@ -10,6 +10,7 @@ import {
   NavbarMenuItem,
   User,
   Skeleton,
+  user,
 } from "@heroui/react";
 import NextLink from "next/link";
 
@@ -19,7 +20,6 @@ import { Button, Link } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { siteConfig } from "@/config/site";
 import { signOut, useSession } from "next-auth/react";
-import { UserWithDetails } from "@/interface";
 import { useState } from "react";
 import { isUserAdmin, isUserSubscribed } from "@/auth-guard";
 import { ThemeSwitcher } from "./ThemeSwitcher";
@@ -28,8 +28,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { data: session, status } = useSession();
-
-  console.log("session", session);
 
   return (
     <HeroUINavbar
@@ -107,7 +105,7 @@ const Navbar = () => {
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitcher />
-        {session?.user && status === "authenticated" ? (
+        {session?.user.id && status === "authenticated" ? (
           <>
             <NavbarMenuToggle aria-label="Open menu" />
             <NavbarMenu className="pt-16">
@@ -116,11 +114,11 @@ const Navbar = () => {
                 avatarProps={{
                   isBordered: true,
                   src:
-                    session.user.profilepicture || "/images/default_user.png",
+                    session?.user.profilepicture || "/images/default_user.png",
                 }}
                 className="transition-transform"
-                description={session.user.email}
-                name={session.user.name}
+                description={session?.user.email}
+                name={session?.user.name}
               />
               {isUserAdmin(session.user) ? (
                 <NavbarMenuItem>

@@ -157,29 +157,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.profilepicture = updatedUser?.ProfilePicture?.url;
       }
 
+      console.log("token:", token);
+
       return token;
     },
     async session({ session, token }: any) {
       // If the token has a user, we add it to the session
-      session.id = token.id;
-      session.email = token.email;
-      session.name = token.name;
-      session.role = token.role;
-      session.subscribed = token.subscribed;
-      session.profilepicture = token.profilepicture;
-
-      // Remove sensitive information from the session
-      // delete session.user.password;
+      if (token) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.name = token.name;
+        session.user.role = token.role;
+        session.user.subscribed = token.subscribed;
+        session.user.profilepicture = token.profilepicture;
+      }
 
       return session;
     },
-    /*     async authorized({ request, auth }: any) {
-      const protectedPaths = [/\/app\/(.*)/, /\/admin\/(.*)/];
-
-      const { pathname } = request.nextUrl;
-
-      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
-    }, */
   },
 
   providers: [
