@@ -129,14 +129,19 @@ export const cancelSubscription = async (email: string) => {
 
 export const getInvoices = async () => {
   const session = await auth();
-  if (!session?.user?.Subscription?.id) {
+
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId: session?.user.id },
+  });
+
+  if (!subscription?.id) {
     return {
       invoices: [],
     };
   }
 
   const invoices = await stripe.invoices.list({
-    customer: session.user.Subscription.customerId,
+    customer: subscription.customerId,
   });
 
   if (!invoices || invoices.data.length === 0) {

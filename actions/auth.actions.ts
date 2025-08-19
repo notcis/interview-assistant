@@ -166,8 +166,15 @@ export const updateUserPassword = async ({
     });
 
     // Check if the user has a credentials auth provider
+
+    const authProvider = await prisma.authProvider.findMany({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
     if (
-      !session?.user?.authProvider.some(
+      !authProvider.some(
         (provider: { provider: string }) =>
           provider.provider === ProviderName.credentials
       )
