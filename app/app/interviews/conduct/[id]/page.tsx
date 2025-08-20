@@ -1,12 +1,14 @@
 import { getInterviewById } from "@/actions/interview.action";
 import Interview from "@/components/interview/Interview";
 import { ResultWithQuestionWithInterview } from "@/interface";
+import { requireSubscription } from "@/sub-guard";
 
 export default async function InterviewConductPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireSubscription();
   const { id } = await params;
 
   const interview: ResultWithQuestionWithInterview | null =

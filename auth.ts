@@ -158,8 +158,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.profilepicture = updatedUser?.ProfilePicture?.url;
       }
 
-      console.log("token:", token);
-
       return token;
     },
     async session({ session, token }: any) {

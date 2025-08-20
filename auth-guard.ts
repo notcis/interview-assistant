@@ -1,5 +1,3 @@
-import { UserWithDetails } from "./interface";
-
 export const isUserSubscribed = (user: any) => {
   return user?.subscribed === "active" || user?.subscribed === "past_due";
 };

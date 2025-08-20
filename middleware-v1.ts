@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+/* import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isUserAdmin, isUserSubscribed } from "./auth-guard";
@@ -36,3 +36,6 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/app/:path*", "/admin/:path*"],
 };
+ */
+
+export { auth as middleware } from "@/auth";
