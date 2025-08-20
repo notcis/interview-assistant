@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isUserAdmin, isUserSubscribed } from "./auth-guard";
-import { auth } from "./auth";
 
 export default async function middleware(request: NextRequest) {
   // อ่านจาก env ที่ถูกฝังตอน build (ไม่ต้องส่ง secret)
@@ -18,8 +17,6 @@ export default async function middleware(request: NextRequest) {
   // ใช้ path แบบไม่ต้องลงท้ายด้วย / เพื่อครอบคลุมทั้ง /app และ /app/xxx
   const isProtectedPath = pathname.startsWith("/app");
   const isProtectedAdminPath = pathname.startsWith("/admin");
-
-  console.log(token);
 
   const IsSubscribed = isUserSubscribed(token);
   const IsAdmin = isUserAdmin(token);
