@@ -27,7 +27,12 @@ const Unsubscribe = () => {
         toast.error("Failed to unsubscribe");
         return;
       }
-      const updateSession = await update({
+
+      await update();
+      toast.success("Subscription updated successfully!");
+      router.push("/");
+
+      /*    const updateSession = await update({
         Subscription: {
           id: res.subscription.id!,
           status: res.subscription.status,
@@ -37,7 +42,7 @@ const Unsubscribe = () => {
       if (updateSession) {
         toast.success("Subscription updated successfully!");
         router.push("/");
-      }
+      } */
     });
   };
 

@@ -86,7 +86,11 @@ const CheckoutForm = () => {
           return;
         }
 
-        const updateSession = await update({
+        await update();
+        toast.success("Subscription created successfully!");
+        router.push("/app/dashboard");
+
+        /*   const updateSession = await update({
           Subscription: {
             id: res.subscription.id,
             status: res.subscription.status,
@@ -96,7 +100,7 @@ const CheckoutForm = () => {
         if (updateSession) {
           toast.success("Subscription created successfully!");
           router.push("/app/dashboard");
-        }
+        } */
 
         // Handle successful subscription creation
       } catch (error: any) {
