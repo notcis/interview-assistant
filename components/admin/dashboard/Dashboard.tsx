@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import DashboardStats from ".//DashboardStats";
+
 import StatsDatePicker from "@/components/date-picker/StatsDatePicker";
+import DashboardStats from "./DashboardStats";
 
 const Dashboard = ({
   data,
